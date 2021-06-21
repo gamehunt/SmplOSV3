@@ -52,7 +52,7 @@ Mkfile.old
 dkms.conf
 
 #build dirs & stuff
-build/
-mount/
+build
+mount
 .vscode
 disk.img
