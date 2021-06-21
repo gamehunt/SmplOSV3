@@ -38,8 +38,8 @@ _start:
     push eax
     push ebx
 
-	extern kernel_main
-	call kernel_main
+	extern loader_main
+	call loader_main
 
 	cli
 .hang:	

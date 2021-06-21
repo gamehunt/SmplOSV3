@@ -1,2 +1,2 @@
 ./build.sh
-qemu-system-i386 -drive format=raw,file=disk.img
+qemu-system-i386 -drive format=raw,file=disk.img -m 1G
