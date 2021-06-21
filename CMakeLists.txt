@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.20)
+set(CMAKE_C_COMPILER "/usr/bin/i686-elf-gcc")
+set(CMAKE_FIND_ROOT_PATH "/usr/i686-elf")
+set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
+include_directories(include)
+project(SmplOSV3-exo VERSION 1.0)
+ADD_SUBDIRECTORY(src/kernel)
