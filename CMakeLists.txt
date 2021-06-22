@@ -16,7 +16,7 @@ execute_process(
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/loader
 )
 execute_process(
-    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/loader
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/loader --target install
 )
 
 ExternalProject_Add(kernel

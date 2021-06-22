@@ -1,2 +1,3 @@
-sudo rm -rf build || 1
-cmake . -Bbuild && cd build && sudo make && sync
+sudo rm -rf build   || 1
+sudo rm -rf include || 1
+sudo cmake . -Bbuild && sync

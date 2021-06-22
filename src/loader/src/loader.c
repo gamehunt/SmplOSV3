@@ -3,10 +3,12 @@
 #include <stdint.h>
 #include <io.h>
 #include <util/printf.h>
+#include <util/string.h>
 #include <multiboot2.h>
 #include <log.h>
 #include <memory.h>
 #include <elf64.h>
+#include <serial.h>
 
  
 #if defined(__linux__)
@@ -44,10 +46,7 @@ void loader_main(uint32_t mbt, uint32_t magic)
     struct multiboot_tag_framebuffer *tagfb; 
     multiboot_memory_map_t *tag_mmap;
     uint32_t *fb;
-    uint32_t size;
-    size = *(uint32_t*)mbt;
     uint32_t kernel_start = 0xFFFFFFFF;
-    uint32_t kernel_end;
     uint32_t end = 0;
     for (
        tag = (struct multiboot_tag *) (mbt + 8);
@@ -87,7 +86,6 @@ void loader_main(uint32_t mbt, uint32_t magic)
                 if(!strcmp(((struct multiboot_tag_module *) tag)->cmdline, "KERNEL")){
                     info ("Identified kernel");
                     kernel_start = ((struct multiboot_tag_module *) tag)->mod_start;
-                    kernel_end   = ((struct multiboot_tag_module *) tag)->mod_end;
                 }
                 break;
             case MULTIBOOT_TAG_TYPE_BASIC_MEMINFO:

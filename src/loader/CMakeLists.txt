@@ -10,8 +10,13 @@ enable_language(C)
 include_directories(include)
 project(SmplOSV3-exo-loader VERSION 1.0)
 add_link_options(-T ${CMAKE_CURRENT_SOURCE_DIR}/src/link.ld -ffreestanding -nostdlib -lgcc)
+add_definitions(-DK_SMPLOS_LOADER)
 FILE(GLOB ASM_SRCS src/asm/*.asm)
 FILE(GLOB C_SRCS src/*.c src/util/*.c)
 FILE(GLOB BOOT src/boot.asm)
 ADD_EXECUTABLE(smplos_loader.bin ${BOOT} ${ASM_SRCS} ${C_SRCS})
 install(TARGETS smplos_loader.bin DESTINATION /mnt/smplos/boot)
+INSTALL (
+    DIRECTORY   ${CMAKE_SOURCE_DIR}/include/
+    DESTINATION ${CMAKE_SOURCE_DIR}/../../include/loader
+    FILES_MATCHING PATTERN "*.h*")
