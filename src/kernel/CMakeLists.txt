@@ -10,7 +10,12 @@ enable_language(C)
 include_directories(include ${CMAKE_CURRENT_SOURCE_DIR}/../../include)
 project(SmplOSV3-exo-kernel VERSION 1.0)
 add_link_options(-T ${CMAKE_CURRENT_SOURCE_DIR}/src/link.ld -ffreestanding -nostdlib -lgcc)
+add_definitions(-DK_SMPLOS_KERNEL)
 FILE(GLOB C_SRCS src/*.c)
 FILE(GLOB ASM_SRC src/*.asm)
 ADD_EXECUTABLE(smplos_kernel.bin ${ASM_SRC} ${C_SRCS})
 install(TARGETS smplos_kernel.bin DESTINATION /mnt/smplos/boot)
+INSTALL (
+    DIRECTORY   ${CMAKE_SOURCE_DIR}/include/
+    DESTINATION ${CMAKE_SOURCE_DIR}/../../include/kernel
+    FILES_MATCHING PATTERN "*.h*")

@@ -32,5 +32,5 @@ execute_process(
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/kernel
 )
 execute_process(
-    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/kernel
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/kernel --target install
 )
