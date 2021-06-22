@@ -1,2 +1,2 @@
-rm -rf build || 1
-cmake . -Bbuild && cd build && make && sudo make install && sync
+sudo rm -rf build || 1
+cmake . -Bbuild && cd build && sudo make && sync

@@ -1,2 +1,3 @@
 ./build.sh
-qemu-system-i386 -drive format=raw,file=disk.img -m 1G
+sync
+qemu-system-x86_64 -monitor stdio -drive format=raw,file=disk.img -m 1G -d cpu_reset 

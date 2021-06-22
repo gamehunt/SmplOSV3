@@ -1,6 +1,6 @@
-#include <loader/util/printf.h>
-#include <loader/serial.h>
-#include <loader/log.h>
+#include <util/printf.h>
+#include <serial.h>
+#include <log.h>
 #include <stdarg.h>
 
 void _putchar(char character){
