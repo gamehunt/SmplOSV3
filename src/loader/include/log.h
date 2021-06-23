@@ -9,6 +9,7 @@
 #define K_LOADER_LOGLEVEL_INFO  1
 #define K_LOADER_LOGLEVEL_DEBUG 2
 #define K_LOADER_LOGLEVEL_ERROR 3
+#define K_LOADER_LOGLEVEL_WARNING 4
 
 void info( const char *format, ...);
 void debug(const char *format, ...);

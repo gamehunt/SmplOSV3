@@ -50,7 +50,7 @@ void paging_setup(){
 
   //ident map us and our kernel
   for(int i=0;i<512;i++){
-    pt[i]           = 0x1000*i | 3;
+    pt[i]            = 0x1000*i | 3;
   }
 
   for(int i=0;i<512;i++){

@@ -1,5 +1,12 @@
+#include <dev/log.h>
+#include <interrupts.h>
+
 void kernel_main(){
-    asm("hlt");
+    info("Reached kernel entrypoint");
+    setup_interrupts();
+    for(;;) {
+        asm("hlt");
+    }
 }
 
 void _start(){
