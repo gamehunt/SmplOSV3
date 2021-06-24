@@ -18,5 +18,5 @@ ADD_EXECUTABLE(smplos_loader.bin ${BOOT} ${ASM_SRCS} ${C_SRCS})
 install(TARGETS smplos_loader.bin DESTINATION /mnt/smplos/boot)
 INSTALL (
     DIRECTORY   ${CMAKE_SOURCE_DIR}/include/
-    DESTINATION ${CMAKE_SOURCE_DIR}/../../include/loader
+    DESTINATION ${CMAKE_SOURCE_DIR}/../../sysroot/include/loader
     FILES_MATCHING PATTERN "*.h*")

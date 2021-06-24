@@ -16,7 +16,7 @@ if(${BUILD_TYPE} MATCHES "libk")
 endif()
 enable_language(ASM_NASM)
 enable_language(C)
-include_directories(include ${CMAKE_CURRENT_SOURCE_DIR}/../../include)
+include_directories(include ${CMAKE_CURRENT_SOURCE_DIR}/../../sysroot/include)
 project(SmplOSV3-exo-libc VERSION 1.0)
 FILE(GLOB C_SRCS src/*.c src/**/*.c)
 FILE(GLOB ASM_SRC src/*.asm)
@@ -26,10 +26,10 @@ if(${BUILD_TYPE} MATCHES "libk")
     ADD_LIBRARY(k STATIC ${C_SRCS})
     INSTALL(
     TARGETS   k
-    DESTINATION ${CMAKE_SOURCE_DIR}/../../lib
+    DESTINATION ${CMAKE_SOURCE_DIR}/../../sysroot/lib
     )
 endif()
 INSTALL(
     DIRECTORY   ${CMAKE_SOURCE_DIR}/include/
-    DESTINATION ${CMAKE_SOURCE_DIR}/../../include
+    DESTINATION ${CMAKE_SOURCE_DIR}/../../sysroot/include
     FILES_MATCHING PATTERN "*.h*")

@@ -7,8 +7,8 @@ set(CMAKE_FIND_ROOT_PATH "/usr/x86_64-elf")
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 enable_language(ASM_NASM)
 enable_language(C)
-include_directories(include ${CMAKE_CURRENT_SOURCE_DIR}/../../include)
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../lib)
+include_directories(include ${CMAKE_CURRENT_SOURCE_DIR}/../../sysroot/include)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../sysroot/lib)
 project(SmplOSV3-exo-kernel VERSION 1.0)
 add_link_options(-T ${CMAKE_CURRENT_SOURCE_DIR}/src/link.ld -ffreestanding -nostdlib -lgcc)
 add_definitions(-DK_SMPLOS_KERNEL)
@@ -19,6 +19,6 @@ target_link_libraries(smplos_kernel.bin libk.a)
 INSTALL(TARGETS smplos_kernel.bin DESTINATION /mnt/smplos/boot)
 INSTALL (
     DIRECTORY   ${CMAKE_SOURCE_DIR}/include/
-    DESTINATION ${CMAKE_SOURCE_DIR}/../../include/kernel
+    DESTINATION ${CMAKE_SOURCE_DIR}/../../sysroot/include/kernel
     FILES_MATCHING PATTERN "*.h*"
 )

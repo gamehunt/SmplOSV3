@@ -115,9 +115,6 @@ void setup_pic(){
 }
 
 void setup_idt(){
-
-    
-
     memset(&idt_entries, 0, sizeof(struct idt_descriptor) * 256);
 
     idt_ptr.pad = 0;
