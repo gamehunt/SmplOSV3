@@ -2,12 +2,49 @@
 #include <io.h>
 #include <dev/log.h>
 #include <string.h>
+#include <types/registers.h>
+#include <panic.h>
 
 #define PIC_A 0x20
 #define PIC_B 0xA0
 #define PIC_A_DATA 0x21
 #define PIC_B_DATA 0xA1
 #define PIC_ENDOFINT 0x20
+
+const char *panic_messages[] = {
+	"Division by zero",				
+	"Debug",
+	"Non-maskable interrupt",
+	"Breakpoint",
+	"Detected overflow",
+	"Out-of-bounds",				
+	"Invalid opcode",
+	"No coprocessor",
+	"Double fault",
+	"Coprocessor segment overrun",
+	"Bad TSS",						/* 10 */
+	"Segment not present",
+	"Stack fault",
+	"General protection fault",
+	"Page fault",
+	"Unknown interrupt",			
+	"Coprocessor fault",
+	"Alignment check",
+	"Machine check",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved"
+};
 
 extern void idt_load();
 
@@ -172,10 +209,12 @@ void setup_idt(){
 	set_gate(47, (uint64_t) irq15, 0x08, 0x8E);
 
     idt_load();
+
+	int a = 1/0;
 }
 
-void fault_handler(void*){
-    info("INTERRUPT ISR!!");
+void fault_handler(regs_t r){
+	panic(r, panic_messages[r->int_no]);
 }
 
 void irq_end(uint8_t int_no){
@@ -185,7 +224,6 @@ void irq_end(uint8_t int_no){
 	outb(0x20, 0x20);
 }
 
-void irq_handler(void* r){
-    info("INTERRUPT IRQ!!");
-    asm("hlt");
+void irq_handler(regs_t r){
+	irq_end(r->int_no - 32);
 }

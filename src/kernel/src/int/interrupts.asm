@@ -41,7 +41,6 @@
 global idt_load
 extern idt_ptr
 
-
 idt_load:							;loads the idt
 
 cli
@@ -105,6 +104,8 @@ extern fault_handler
 isr_stub:
     pushAll
 
+    mov rdi, rsp 
+
     mov     ax, ds
     push    rax
 
@@ -114,6 +115,7 @@ isr_stub:
     mov     fs, ax
     mov     gs, ax
 
+    
     call fault_handler
 
     pop      rbx
@@ -127,7 +129,7 @@ isr_stub:
     sti
     iretq
 
-  %macro IRQ 2
+%macro IRQ 2
 	global irq%1
 	irq%1:
 		cli
@@ -157,9 +159,10 @@ extern irq_handler
 
 irq_stub:
     cli
-
-
-    pushAll                    ; Pushes edi,esi,ebp,esp,ebx,edx,ecx,eax
+    pushAll  ; Pushes edi,esi,ebp,esp,ebx,edx,ecx,eax
+    
+    mov rdi, rsp 
+                      
     mov ax, ds               ; Lower 16-bits of eax = ds.
     push rax                 ; save the data segment descriptor
 
@@ -170,6 +173,7 @@ irq_stub:
     mov gs, ax
 
     call irq_handler
+    
     pop rbx        ; reload the original data segment descriptor
     mov ds, bx
     mov es, bx

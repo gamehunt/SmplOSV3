@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef K_SMPLOS_INTERRUPTS_H
+#define K_SMPLOS_INTERRUPTS_H
+
 #include <stdint.h>
 
 struct idt_descriptor{
@@ -23,3 +26,5 @@ void setup_interrupts();
 void setup_idt();
 void setup_pic();
 void set_gate(uint8_t num, uint64_t base, uint8_t sel, uint8_t flags);
+
+#endif
