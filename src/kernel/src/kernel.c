@@ -4,8 +4,14 @@
 #include <loader/bootinfo.h>
 #include <memory.h>
 
+extern void enter_userspace(void *);
+
+void gpf(){
+    while(1){;}
+}
+
 void kernel_main(bootinfo_t* bootinfo){
-    info("Reached kernel entrypoint, bootinfo=0x%llx (%d entries)", bootinfo, bootinfo->mem_size);
+    info("Reached kernel entrypoint, bootinfo=0x%llx (%d entries, tss=0x%llx)", bootinfo, bootinfo->mem_size, bootinfo->tss);
     setup_interrupts();
     info("Initializing MMU");
     for(uint8_t i = 0;i< bootinfo->mem_size; i++){
@@ -27,6 +33,17 @@ void kernel_main(bootinfo_t* bootinfo){
     init_paging();
 
     init_heap(MB(16));
+
+    info("Mapping framebuffer at 0x%llx", bootinfo->framebuffer);
+
+    for(uint32_t i=0;i<1024*768*32;i+=4096){
+        map(bootinfo->framebuffer + i, bootinfo->framebuffer + i);
+    }
+
+    tss_entry_t* tss = (tss_entry_t*)bootinfo->tss;
+    info("Kernel stack at %llx", tss->rsp0);
+
+    enter_userspace(gpf);
 
     for(;;) {
         asm("hlt");

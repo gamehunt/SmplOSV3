@@ -5,7 +5,7 @@ extern paging_setup
 
 gdt_load:
     cli         ;
-    lgdt [gp+2]       
+    lgdt [gp+2]    
     mov eax,0x10
     mov ds,eax
     mov es,eax
@@ -60,69 +60,33 @@ setup_longmode:
     
     ret
 
-global enter_kernel
-
-GDT64:                           ; Global Descriptor Table (64-bit).
-    .Null: equ $ - GDT64         ; The null descriptor. 0x0
-    dw 0xFFFF                    ; Limit (low).
-    dw 0                         ; Base (low).
-    db 0                         ; Base (middle)
-    db 0                         ; Access.
-    db 1                         ; Granularity.
-    db 0                         ; Base (high).
-    .Code: equ $ - GDT64         ; The code descriptor. 0x8
-    dw 0                         ; Limit (low).
-    dw 0                         ; Base (low).
-    db 0                         ; Base (middle)
-    db 10011010b                 ; Access (exec/read).
-    db 10101111b                 ; Granularity, 64 bits flag, limit19:16.
-    db 0                         ; Base (high).
-    .Data: equ $ - GDT64         ; The data descriptor. 0x10
-    dw 0                         ; Limit (low).
-    dw 0                         ; Base (low).
-    db 0                         ; Base (middle)
-    db 10010010b                 ; Access (read/write).
-    db 00000000b                 ; Granularity.
-    db 0                         ; Base (high).
-    .UserCode: equ $ - GDT64     ; The user code descriptor. 0x18
-    dw 0                         ; Limit (low).
-    dw 0                         ; Base (low).
-    db 0                         ; Base (middle)
-    db 11111010b                 ; Access (exec/read).
-    db 10101111b                 ; Granularity, 64 bits flag, limit19:16.
-    db 0                         ; Base (high).
-    .UserData: equ $ - GDT64     ; The user data descriptor. 0x20
-    dw 0                         ; Limit (low).
-    dw 0                         ; Base (low).
-    db 0                         ; Base (middle)
-    db 11110010b                 ; Access (read/write).
-    db 00000000b                 ; Granularity.
-    db 0                         ; Base (high).
-    .Pointer:                    ; The GDT-pointer.
-    dw $ - GDT64 - 1             ; Limit.
-    dq GDT64          
-
+global enter_kernel     
+extern gp64
+extern gdt64_install
 enter_kernel:
 	push	ebp
 	mov	    ebp, esp                ; Set up the stack so the variables passed from the C code can be read
  
 	mov	esi, [ebp+8]                ; This is the kernel entry point
 	mov	[k_ptr], esi
- 
-    
-	lgdt	[GDT64.Pointer]                  ; Load GDT
-    
-	jmp	GDT64.Code:Realm64        ; Reload code selector by jumping to 64-bit code
+
+	lgdt [gp64+2]                  ; Load GDT 
+
+	jmp	0x08:Realm64        ; Reload code selector by jumping to 64-bit code
 
 [BITS 64]
 Realm64:
     cli                           ; Clear the interrupt flag.
-    mov ax, GDT64.Data            ; Set the A-register to the data descriptor.
+
+    mov ax, 0x10                  ; Set the A-register to the data descriptor.
     mov ds, ax                    ; Set the data segment to the A-register.
     mov es, ax                    ; Set the extra segment to the A-register.
     mov fs, ax                    ; Set the F-segment to the A-register.
     mov gs, ax                    ; Set the G-segment to the A-register.
     mov ss, ax                    ; Set the stack segment to the A-register.
+
+    mov ax, 0x28 | 3
+    ltr ax
 
 	mov	edi, [ebp + 12]		    ; 1st argument of kernel_main (pointer to multiboot structure)
 	mov	rax, [k_ptr] 

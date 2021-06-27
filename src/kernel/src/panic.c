@@ -6,6 +6,7 @@ void panic(regs_t dump, const char* message){
     error("--------------------------------------------------------------------");
     error("Unrecoverable error occurred in primary kernel and it was terminated.");
     error("Error description: %s", message);
+    error("Error code: 0x%x", dump ? dump->err_code : 0);
     error("Registers dump:");
     if(dump){
         error("\tRAX: 0x%llx | RBX: 0x%llx | RCX: 0x%llx | RDX: 0x%llx", dump->rax, dump->rbx, dump->rcx, dump->rdx);

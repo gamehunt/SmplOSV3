@@ -22,6 +22,8 @@
 extern void setup_longmode();
 extern void enter_kernel(uint32_t entry, uint32_t bootinfo);
 
+extern tss_entry_t tss_entry;
+
 bootinfo_t bootinfo;
 bootinfo_mem_region_t mem_regions[256];
 
@@ -115,6 +117,9 @@ void loader_main(uint32_t mbt, uint32_t magic)
         }
     }
     bootinfo.mem_size = memreg_ptr;
+    bootinfo.framebuffer = (uint64_t)fb;
+    bootinfo.framebuffer &= 0xFFFFFFFF;
+    bootinfo.tss         = &tss_entry;
     info("Placed bootinfo at 0x%x (%d entries)", &bootinfo, bootinfo.mem_size);
     uint32_t entry = load_elf64(kernel_start);
     setup_longmode();
