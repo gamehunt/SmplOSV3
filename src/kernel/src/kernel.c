@@ -1,4 +1,5 @@
 #include <dev/log.h>
+#include <util.h>
 #include <interrupts.h>
 #include <loader/bootinfo.h>
 #include <memory.h>
@@ -23,8 +24,10 @@ void kernel_main(bootinfo_t* bootinfo){
         }
     }
     info("PMM stack size = %d KB (end at 0x%llx)", pmm_get_stack_size()*8/1024, PMM_STACK_ADDRESS + pmm_get_stack_size()*8);
-    pmm_init_metadata_bitmap();
     init_paging();
+
+    init_heap(MB(16));
+
     for(;;) {
         asm("hlt");
     }

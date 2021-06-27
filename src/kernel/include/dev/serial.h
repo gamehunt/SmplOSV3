@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <util.h>
 
-#define PORT 0x3f8 
+#define PORT 0x3F8 
 
 CH_START
 

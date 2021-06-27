@@ -2,6 +2,7 @@
 #include <dev/log.h>
 
 void panic(regs_t dump, const char* message){
+    asm("cli");
     error("--------------------------------------------------------------------");
     error("Unrecoverable error occurred in primary kernel and it was terminated.");
     error("Error description: %s", message);

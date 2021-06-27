@@ -11,7 +11,7 @@
 #define PIC_B_DATA 0xA1
 #define PIC_ENDOFINT 0x20
 
-const char *panic_messages[] = {
+static const char *panic_messages[] = {
 	"Division by zero",				
 	"Debug",
 	"Non-maskable interrupt",
@@ -102,7 +102,7 @@ extern void irq15();
 struct idt_descriptor idt_entries[256];
 struct idt_ptr        idt_ptr;
 
-interrupt_handler_t   interrupt_handlers[256];
+static interrupt_handler_t   interrupt_handlers[256];
 
 void set_gate(uint8_t num, uint64_t base, uint8_t sel, uint8_t flags){
     idt_entries[num].zero = 0;
