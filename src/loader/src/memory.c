@@ -7,11 +7,15 @@ extern void gdt_load();
 struct gdt_entry gdt[5];
 struct gdt_ptr gp;
 
-uint64_t   pml4[512]          __attribute__((aligned(0x1000)));
-uint64_t   pd_ptr_table[512]  __attribute__((aligned(0x1000)));
-uint64_t   pd[512]            __attribute__((aligned(0x1000)));
-uint64_t   pt[512]            __attribute__((aligned(0x1000)));
-uint64_t   pt1[512]           __attribute__((aligned(0x1000)));
+uint64_t   pml4[512]           __attribute__((aligned(0x1000)));
+uint64_t   pd_ptr_table[512]   __attribute__((aligned(0x1000)));
+uint64_t   pd[512]             __attribute__((aligned(0x1000)));
+uint64_t   pt[512]             __attribute__((aligned(0x1000)));
+uint64_t   pt1[512]            __attribute__((aligned(0x1000)));
+uint64_t   pt2[512]            __attribute__((aligned(0x1000)));
+uint64_t   pt3[512]            __attribute__((aligned(0x1000)));
+uint64_t   pt4[512]            __attribute__((aligned(0x1000)));
+uint64_t   pt5[512]            __attribute__((aligned(0x1000)));
 
 void add_gdt_entry(int num,uint32_t base,uint32_t limit,uint32_t access,uint32_t gran) {
   gdt[num].base_low = base;
@@ -40,20 +44,27 @@ void paging_setup(){
   memset(pml4, 0, 4096);
   memset(pd_ptr_table, 0, 4096);
   memset(pd, 0, 4096);
-  memset(pt, 0, 4096);
-  memset(pt1, 0, 4096);
 
   pml4[0]         = (uint64_t)&pd_ptr_table  | 3;
   pd_ptr_table[0] = (uint64_t)&pd            | 3;
   pd[0]           = (uint64_t)&pt            | 3;
   pd[1]           = (uint64_t)&pt1           | 3;
+  pd[2]           = (uint64_t)&pt2           | 3;
+  pd[3]           = (uint64_t)&pt3           | 3;
+  pd[4]           = (uint64_t)&pt4           | 3;
+  pd[5]           = (uint64_t)&pt5           | 3;
 
-  //ident map us and our kernel
   for(int i=0;i<512;i++){
-    pt[i]            = 0x1000*i | 3;
+    ((uint64_t*)pd[511])[i]            = 0x1000*i | 3;
   }
 
+  //ident map us and our kernel + space for MMU
   for(int i=0;i<512;i++){
-    pt1[i]           = (0x200000 + 0x1000*i) | 3;
+    pt[i]            = 0x1000*i | 3;
+    pt1[i]           = (0x200000 +  0x1000*i) | 3;
+    pt2[i]           = (0x400000 +  0x1000*i) | 3;
+    pt3[i]           = (0x600000 +  0x1000*i) | 3;
+    pt4[i]           = (0x800000 +  0x1000*i) | 3;
+    pt5[i]           = (0xa00000 +  0x1000*i) | 3;
   }
 }

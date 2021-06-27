@@ -14,6 +14,17 @@ gdt_load:
     mov ss,eax
     ret
 
+global enable_a20
+enable_a20:
+	in al, 0x92
+	test al, 2
+	jnz after
+	or al, 2
+	and al, 0xFE
+	out 0x92, al
+after:
+    ret
+
 global setup_longmode
 
 setup_longmode:
@@ -52,25 +63,39 @@ setup_longmode:
 global enter_kernel
 
 GDT64:                           ; Global Descriptor Table (64-bit).
-    .Null: equ $ - GDT64         ; The null descriptor.
+    .Null: equ $ - GDT64         ; The null descriptor. 0x0
     dw 0xFFFF                    ; Limit (low).
     dw 0                         ; Base (low).
     db 0                         ; Base (middle)
     db 0                         ; Access.
     db 1                         ; Granularity.
     db 0                         ; Base (high).
-    .Code: equ $ - GDT64         ; The code descriptor.
+    .Code: equ $ - GDT64         ; The code descriptor. 0x8
     dw 0                         ; Limit (low).
     dw 0                         ; Base (low).
     db 0                         ; Base (middle)
     db 10011010b                 ; Access (exec/read).
     db 10101111b                 ; Granularity, 64 bits flag, limit19:16.
     db 0                         ; Base (high).
-    .Data: equ $ - GDT64         ; The data descriptor.
+    .Data: equ $ - GDT64         ; The data descriptor. 0x10
     dw 0                         ; Limit (low).
     dw 0                         ; Base (low).
     db 0                         ; Base (middle)
     db 10010010b                 ; Access (read/write).
+    db 00000000b                 ; Granularity.
+    db 0                         ; Base (high).
+    .UserCode: equ $ - GDT64     ; The user code descriptor. 0x18
+    dw 0                         ; Limit (low).
+    dw 0                         ; Base (low).
+    db 0                         ; Base (middle)
+    db 11111010b                 ; Access (exec/read).
+    db 10101111b                 ; Granularity, 64 bits flag, limit19:16.
+    db 0                         ; Base (high).
+    .UserData: equ $ - GDT64     ; The user data descriptor. 0x20
+    dw 0                         ; Limit (low).
+    dw 0                         ; Base (low).
+    db 0                         ; Base (middle)
+    db 11110010b                 ; Access (read/write).
     db 00000000b                 ; Granularity.
     db 0                         ; Base (high).
     .Pointer:                    ; The GDT-pointer.

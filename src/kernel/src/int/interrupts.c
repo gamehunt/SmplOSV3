@@ -102,6 +102,8 @@ extern void irq15();
 struct idt_descriptor idt_entries[256];
 struct idt_ptr        idt_ptr;
 
+interrupt_handler_t   interrupt_handlers[256];
+
 void set_gate(uint8_t num, uint64_t base, uint8_t sel, uint8_t flags){
     idt_entries[num].zero = 0;
     idt_entries[num].ist  = 0;
@@ -158,16 +160,16 @@ void setup_idt(){
     idt_ptr.offset = (uint64_t) idt_entries;
     idt_ptr.limit  = (uint16_t) (sizeof(struct idt_descriptor) * 256 - 1);
 
-	set_gate(0, (uint64_t)  isr0, 0x08, 0x8E);
-	set_gate(1, (uint64_t)  isr1, 0x08, 0x8E);
-	set_gate(2, (uint64_t)  isr2, 0x08, 0x8E);
-	set_gate(3, (uint64_t)  isr3, 0x08, 0x8E);
-	set_gate(4, (uint64_t)  isr4, 0x08, 0x8E);
-	set_gate(5, (uint64_t)  isr5, 0x08, 0x8E);
-	set_gate(6, (uint64_t)  isr6, 0x08, 0x8E);
-	set_gate(7, (uint64_t)  isr7, 0x08, 0x8E);
-	set_gate(8, (uint64_t)  isr8, 0x08, 0x8E);
-	set_gate(9, (uint64_t)  isr9, 0x08, 0x8E);
+	set_gate(0, (uint64_t)  isr0,  0x08, 0x8E);
+	set_gate(1, (uint64_t)  isr1,  0x08, 0x8E);
+	set_gate(2, (uint64_t)  isr2,  0x08, 0x8E);
+	set_gate(3, (uint64_t)  isr3,  0x08, 0x8E);
+	set_gate(4, (uint64_t)  isr4,  0x08, 0x8E);
+	set_gate(5, (uint64_t)  isr5,  0x08, 0x8E);
+	set_gate(6, (uint64_t)  isr6,  0x08, 0x8E);
+	set_gate(7, (uint64_t)  isr7,  0x08, 0x8E);
+	set_gate(8, (uint64_t)  isr8,  0x08, 0x8E);
+	set_gate(9, (uint64_t)  isr9,  0x08, 0x8E);
 	set_gate(10, (uint64_t) isr10, 0x08, 0x8E);
 	set_gate(11, (uint64_t) isr11, 0x08, 0x8E);
 	set_gate(12, (uint64_t) isr12, 0x08, 0x8E);
@@ -191,16 +193,16 @@ void setup_idt(){
 	set_gate(30, (uint64_t) isr30, 0x08, 0x8E);
 	set_gate(31, (uint64_t) isr31, 0x08, 0x8E);
     
-    set_gate(32, (uint64_t) irq0, 0x08, 0x8E);
-	set_gate(33, (uint64_t) irq1, 0x08, 0x8E);
-	set_gate(34, (uint64_t) irq2, 0x08, 0x8E);
-	set_gate(35, (uint64_t) irq3, 0x08, 0x8E);
-	set_gate(36, (uint64_t) irq4, 0x08, 0x8E);
-	set_gate(37, (uint64_t) irq5, 0x08, 0x8E);
-	set_gate(38, (uint64_t) irq6, 0x08, 0x8E);
-	set_gate(39, (uint64_t) irq7, 0x08, 0x8E);
-	set_gate(40, (uint64_t) irq8, 0x08, 0x8E);
-	set_gate(41, (uint64_t) irq9, 0x08, 0x8E);
+    set_gate(32, (uint64_t) irq0,  0x08, 0x8E);
+	set_gate(33, (uint64_t) irq1,  0x08, 0x8E);
+	set_gate(34, (uint64_t) irq2,  0x08, 0x8E);
+	set_gate(35, (uint64_t) irq3,  0x08, 0x8E);
+	set_gate(36, (uint64_t) irq4,  0x08, 0x8E);
+	set_gate(37, (uint64_t) irq5,  0x08, 0x8E);
+	set_gate(38, (uint64_t) irq6,  0x08, 0x8E);
+	set_gate(39, (uint64_t) irq7,  0x08, 0x8E);
+	set_gate(40, (uint64_t) irq8,  0x08, 0x8E);
+	set_gate(41, (uint64_t) irq9,  0x08, 0x8E);
 	set_gate(42, (uint64_t) irq10, 0x08, 0x8E);
 	set_gate(43, (uint64_t) irq11, 0x08, 0x8E);
 	set_gate(44, (uint64_t) irq12, 0x08, 0x8E);
@@ -209,12 +211,29 @@ void setup_idt(){
 	set_gate(47, (uint64_t) irq15, 0x08, 0x8E);
 
     idt_load();
+}
 
-	int a = 1/0;
+void set_isr_handler(interrupt_handler_t handler, uint8_t interrupt){
+	if(interrupt >= 32){
+		warning("Tried to assign handler to out-of-range ISR %d", interrupt);
+	}else{
+		interrupt_handlers[interrupt] = handler;
+	}
+}
+void set_irq_handler(interrupt_handler_t handler, uint8_t interrupt){
+	if(interrupt > 15){
+		warning("Tried to assign handler to out-of-range IRQ %d", interrupt);
+	}else{
+		interrupt_handlers[interrupt+32] = handler;
+	}
 }
 
 void fault_handler(regs_t r){
-	panic(r, panic_messages[r->int_no]);
+	if(interrupt_handlers[r->int_no]){
+		interrupt_handlers[r->int_no](r);
+	}else{
+		panic(r, panic_messages[r->int_no]);
+	}
 }
 
 void irq_end(uint8_t int_no){
@@ -225,5 +244,8 @@ void irq_end(uint8_t int_no){
 }
 
 void irq_handler(regs_t r){
+	if(interrupt_handlers[r->int_no]){
+		interrupt_handlers[r->int_no](r);
+	}
 	irq_end(r->int_no - 32);
 }

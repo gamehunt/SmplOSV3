@@ -9,8 +9,8 @@ int strcmp(const char* s1, const char* s2)
 }
 
 void * memcpy( void * destptr, const void * srcptr, size_t num ){
-    uint32_t *buf = (uint32_t *)destptr;
-    uint32_t *src = (uint32_t *)srcptr;
+    uint8_t *buf = (uint8_t *)destptr;
+    uint8_t *src = (uint8_t *)srcptr;
     while (num--)
     {
         *buf++ = *src++;
@@ -18,11 +18,11 @@ void * memcpy( void * destptr, const void * srcptr, size_t num ){
     return destptr;
 }
 
-void * memset( void * memptr, int val, size_t num ){
-    uint32_t *buf = (uint32_t *)memptr;
+void * memset( void * memptr, uint8_t val, size_t num ){
+    uint8_t *buf = (uint8_t *)memptr;
     while (num--)
     {
-        *buf++ = (uint32_t)val;
+        *buf++ = (uint8_t)val;
     }
     return memptr;
 }

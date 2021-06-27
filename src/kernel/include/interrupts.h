@@ -1,9 +1,8 @@
-#pragma once
-
 #ifndef K_SMPLOS_INTERRUPTS_H
 #define K_SMPLOS_INTERRUPTS_H
 
 #include <stdint.h>
+#include <util.h>
 
 struct idt_descriptor{
    uint16_t offset_1; // offset bits 0..15
@@ -21,10 +20,18 @@ struct idt_ptr{
     uint64_t offset;
 }  __attribute__((packed));
 
+typedef void(* interrupt_handler_t) (struct registers *);
+
+CH_START
 
 void setup_interrupts();
 void setup_idt();
 void setup_pic();
 void set_gate(uint8_t num, uint64_t base, uint8_t sel, uint8_t flags);
+
+void set_isr_handler(interrupt_handler_t handler, uint8_t interrupt);
+void set_irq_handler(interrupt_handler_t handler, uint8_t interrupt);
+
+CH_END
 
 #endif

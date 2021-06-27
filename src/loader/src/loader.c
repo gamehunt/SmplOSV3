@@ -1,3 +1,11 @@
+#if defined(__linux__)
+#error "Cant find cross compiler"
+#endif
+ 
+#if !defined(__i386__)
+#error "Invalid arch, need i686-elf"
+#endif
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -9,22 +17,18 @@
 #include <memory.h>
 #include <elf64.h>
 #include <serial.h>
-
- 
-#if defined(__linux__)
-#error "Cant find cross compiler"
-#endif
- 
-#if !defined(__i386__)
-#error "Invalid arch, need i686-elf"
-#endif
+#include <bootinfo.h>
 
 extern void setup_longmode();
 extern void enter_kernel(uint32_t entry, uint32_t bootinfo);
 
+bootinfo_t bootinfo;
+bootinfo_mem_region_t mem_regions[256];
+
 void loader_main(uint32_t mbt, uint32_t magic) 
 {
 
+    enable_a20();
     serial_init();
 
     info("Loading kernel");
@@ -48,6 +52,8 @@ void loader_main(uint32_t mbt, uint32_t magic)
     uint32_t *fb;
     uint32_t kernel_start = 0xFFFFFFFF;
     uint32_t end = 0;
+    uint8_t memreg_ptr = 0;
+
     for (
        tag = (struct multiboot_tag *) (mbt + 8);
        tag->type != MULTIBOOT_TAG_TYPE_END;
@@ -67,12 +73,12 @@ void loader_main(uint32_t mbt, uint32_t magic)
                 for (tag_mmap = ((struct multiboot_tag_mmap *) tag)->entries;
                  (multiboot_uint8_t *) tag_mmap < (multiboot_uint8_t *) tag + tag->size;
                  tag_mmap = (multiboot_memory_map_t *) ((unsigned long) tag_mmap + ((struct multiboot_tag_mmap *) tag)->entry_size)) {
-                    printf("--> 0x%x%x - 0x%x%x - 0x%x\n\r", 
-                    (unsigned) (tag_mmap->addr >> 32), 
-                    (unsigned) (tag_mmap->addr & 0xffffffff), 
-                    (unsigned) (tag_mmap->len >> 32), 
-                    (unsigned) (tag_mmap->len & 0xffffffff),
-                    (unsigned) (tag_mmap->type));
+                     
+                    bootinfo.memory[memreg_ptr].start = tag_mmap->addr;
+                    bootinfo.memory[memreg_ptr].end   = tag_mmap->addr + tag_mmap->len;
+                    bootinfo.memory[memreg_ptr].type  = tag_mmap->type;
+
+                    memreg_ptr++;
                 }
                 break;
             case MULTIBOOT_TAG_TYPE_MODULE:
@@ -108,8 +114,9 @@ void loader_main(uint32_t mbt, uint32_t magic)
                 break;
         }
     }
-    info("Putting bootinfo to 0x%x", end);
+    bootinfo.mem_size = memreg_ptr;
+    info("Placed bootinfo at 0x%x (%d entries)", &bootinfo, bootinfo.mem_size);
     uint32_t entry = load_elf64(kernel_start);
     setup_longmode();
-    enter_kernel(entry, end);
+    enter_kernel(entry, &bootinfo);
 }
