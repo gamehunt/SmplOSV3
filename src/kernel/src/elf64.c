@@ -83,7 +83,7 @@ int elf_get_symval(Elf64_Ehdr *hdr, int table, uint32_t idx)
     uint32_t symtab_entries = symtab->sh_size / symtab->sh_entsize;
     if (idx >= symtab_entries)
     {
-        error("Symbol Index out of Range (%d:%u).\n", table, idx);
+        error("Symbol Index out of Range (%d:%u).", table, idx);
         return ELF_RELOC_ERR;
     }
     int symaddr = (int)hdr + symtab->sh_offset;

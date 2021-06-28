@@ -5,6 +5,7 @@
 #include <types/registers.h>
 #include <panic.h>
 #include <syscall.h>
+#include <proc.h>
 
 #define PIC_A 0x20
 #define PIC_B 0xA0
@@ -214,6 +215,7 @@ void setup_idt(){
 	set_gate(127, (uint64_t)isr127, 0x08, 0xEE);
 
 	set_isr_handler(syscall_handler, 127);
+	set_irq_handler(irq0_listener, 0);
 
 	setup_syscalls();
 

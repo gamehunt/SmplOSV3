@@ -6,6 +6,7 @@
 #include <fs/tar.h>
 #include <elf64.h>
 #include <module.h>
+#include <dev/pit.h>
 
 extern void      enter_userspace(void *, void *);
 extern uint64_t  sysc();
@@ -64,7 +65,7 @@ void kernel_main(bootinfo_t* bootinfo){
         }
     }
 
-    enter_userspace(gpf, stack);
+    pit_phase(1000);
 
     for(;;) {
         asm("hlt");
