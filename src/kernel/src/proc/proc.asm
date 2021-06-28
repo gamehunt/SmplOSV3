@@ -6,9 +6,14 @@ enter_userspace:
 	mov es, ax 
  
 	push rax
-    mov  rbx, rsp
-    push rbx
+    push rsi
 	pushf
 	push 0x1b ; code selector (ring 3 code with bottom 2 bits set for ring 3)
 	push rdi  ; instruction address to return to
 	iretq
+
+global sysc
+sysc:
+	mov rax, 0
+	int 0x7f
+	ret

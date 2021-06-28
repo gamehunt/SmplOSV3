@@ -4,9 +4,13 @@
 #include <loader/bootinfo.h>
 #include <memory.h>
 
-extern void enter_userspace(void *);
+extern void      enter_userspace(void *, void *);
+extern uint64_t  sysc();
+
+uint64_t stack[1024];
 
 void gpf(){
+    sysc();
     while(1){;}
 }
 
@@ -43,7 +47,7 @@ void kernel_main(bootinfo_t* bootinfo){
     tss_entry_t* tss = (tss_entry_t*)bootinfo->tss;
     info("Kernel stack at %llx", tss->rsp0);
 
-    enter_userspace(gpf);
+    enter_userspace(gpf, stack);
 
     for(;;) {
         asm("hlt");

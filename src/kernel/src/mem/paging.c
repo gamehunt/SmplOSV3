@@ -4,7 +4,7 @@
 static uint64_t   pml4[512]               __attribute__((aligned(0x1000)));
 static uint64_t   pd_ptr_table[512]       __attribute__((aligned(0x1000)));
 static uint64_t   pd[512]                 __attribute__((aligned(0x1000)));
-static uint64_t   pt[5][512]             __attribute__((aligned(0x1000)));
+static uint64_t   pt[5][512]              __attribute__((aligned(0x1000)));
 
 extern void set_pml(uint64_t* pml);
 extern void invl_page(uint64_t* pg);

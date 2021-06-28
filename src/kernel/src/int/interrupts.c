@@ -4,6 +4,7 @@
 #include <string.h>
 #include <types/registers.h>
 #include <panic.h>
+#include <syscall.h>
 
 #define PIC_A 0x20
 #define PIC_B 0xA0
@@ -210,15 +211,17 @@ void setup_idt(){
 	set_gate(46, (uint64_t) irq14, 0x08, 0x8E);
 	set_gate(47, (uint64_t) irq15, 0x08, 0x8E);
 
+	set_gate(127, (uint64_t)isr127, 0x08, 0xEE);
+
+	set_isr_handler(syscall_handler, 127);
+
+	setup_syscalls();
+
     idt_load();
 }
 
 void set_isr_handler(interrupt_handler_t handler, uint8_t interrupt){
-	if(interrupt >= 32){
-		warning("Tried to assign handler to out-of-range ISR %d", interrupt);
-	}else{
-		interrupt_handlers[interrupt] = handler;
-	}
+	interrupt_handlers[interrupt] = handler;
 }
 void set_irq_handler(interrupt_handler_t handler, uint8_t interrupt){
 	if(interrupt > 15){
@@ -248,4 +251,9 @@ void irq_handler(regs_t r){
 		interrupt_handlers[r->int_no](r);
 	}
 	irq_end(r->int_no - 32);
+}
+
+void syscall_handler(regs_t regs){
+	syscall_t sys = get_syscall(regs->rax);
+	regs->rax = sys(0,0,0,0,0);
 }
