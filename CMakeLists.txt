@@ -3,6 +3,15 @@ cmake_minimum_required(VERSION 3.20)
 project(SmplOSV3-exo VERSION 1.0)
 include(ExternalProject)
 
+MESSAGE(STATUS "Cleaning...")
+
+execute_process(
+    COMMAND rm -rf build
+    COMMAND rm -rf sysroot
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    ERROR_QUIET
+)
+
 ExternalProject_Add(loader 
     PREFIX     ${CMAKE_SOURCE_DIR}/src/loader
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/loader
@@ -66,5 +75,28 @@ execute_process(
 )
 execute_process(
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/kernel --target install
+)
+
+MESSAGE(STATUS "Creating InitRD")
+
+MESSAGE(STATUS "Cleaning...")
+execute_process(
+    COMMAND rm ramdisk.initrd
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    ERROR_QUIET
+)
+
+MESSAGE(STATUS "Generating...")
+execute_process(
+    COMMAND tar cvf ramdisk.initrd initrd/
+    COMMAND cp  ramdisk.initrd     /mnt/smplos/boot
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
+
+MESSAGE(STATUS "Updating GRUB config")
+
+execute_process(
+    COMMAND cp  grub.cfg  /mnt/smplos/boot/grub/grub.cfg
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 

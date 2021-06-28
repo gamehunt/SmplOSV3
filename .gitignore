@@ -57,3 +57,5 @@ sysroot
 mount
 .vscode
 disk.img
+ramdisk.initrd
+initrd

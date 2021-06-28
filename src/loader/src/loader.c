@@ -53,6 +53,7 @@ void loader_main(uint32_t mbt, uint32_t magic)
     multiboot_memory_map_t *tag_mmap;
     uint32_t *fb;
     uint32_t kernel_start = 0xFFFFFFFF;
+    uint32_t initrd_start = 0xFFFFFFFF;
     uint32_t end = 0;
     uint8_t memreg_ptr = 0;
 
@@ -95,6 +96,10 @@ void loader_main(uint32_t mbt, uint32_t magic)
                     info ("Identified kernel");
                     kernel_start = ((struct multiboot_tag_module *) tag)->mod_start;
                 }
+                if(!strcmp(((struct multiboot_tag_module *) tag)->cmdline, "INITRD")){
+                    info ("Identified initrd");
+                    initrd_start = ((struct multiboot_tag_module *) tag)->mod_start;
+                }
                 break;
             case MULTIBOOT_TAG_TYPE_BASIC_MEMINFO:
                 info ("Found memory info: mem_lower = %uKB, mem_upper = %uKB",
@@ -117,9 +122,11 @@ void loader_main(uint32_t mbt, uint32_t magic)
         }
     }
     bootinfo.mem_size = memreg_ptr;
-    bootinfo.framebuffer = (uint64_t)fb;
+    bootinfo.framebuffer = fb;
     bootinfo.framebuffer &= 0xFFFFFFFF;
     bootinfo.tss         = &tss_entry;
+    bootinfo.initrd      = initrd_start;
+    bootinfo.initrd      &= 0xFFFFFFFF;
     info("Placed bootinfo at 0x%x (%d entries)", &bootinfo, bootinfo.mem_size);
     uint32_t entry = load_elf64(kernel_start);
     setup_longmode();

@@ -14,6 +14,9 @@
 	#define CH_END 
 #endif
 
+#include <stdint.h>
+
 void halt();
+uint8_t endswith(const char *str, const char *suffix);
 
 #endif

@@ -3,6 +3,7 @@
 #include <interrupts.h>
 #include <loader/bootinfo.h>
 #include <memory.h>
+#include <fs/tar.h>
 
 extern void      enter_userspace(void *, void *);
 extern uint64_t  sysc();
@@ -46,6 +47,17 @@ void kernel_main(bootinfo_t* bootinfo){
 
     tss_entry_t* tss = (tss_entry_t*)bootinfo->tss;
     info("Kernel stack at %llx", tss->rsp0);
+
+    if(CHECK_ADDR(bootinfo->initrd)){
+        info("Parsing ramdisk");
+        tar_parsed_t* parsed = tar_parse(bootinfo->initrd);
+        for(int i=0;i<parsed->entry_count; i++){
+            tar_file_t* file = parsed->entries[i];
+            if(endswith(file->filename, ".smpm")){
+                info("Loading module - %s %llx %dB", file->filename, file->start, file->size);
+            }
+        }
+    }
 
     enter_userspace(gpf, stack);
 
