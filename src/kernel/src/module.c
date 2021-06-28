@@ -3,6 +3,8 @@
 #include <elf64.h>
 #include <memory.h>
 #include <panic.h>
+#include <subkernel/iface.h>
+#include <io.h>
 
 static uint16_t k_sym_ptr = 0;
 static k_sym_t k_symtable[256];
@@ -17,6 +19,16 @@ void export_symbols(){
     export_symbol("error", &error);
     export_symbol("debug", &debug);
     export_symbol("log", &log);
+
+    export_symbol("outb", &outb);
+    export_symbol("outw", &outw);
+    export_symbol("outl", &outl);
+
+    export_symbol("inb", &inb);
+    export_symbol("inw", &inw);
+    export_symbol("inl", &inl);
+
+    export_symbol("set_disk_sector_dispatcher", &set_disk_sector_dispatcher);
 }
 
 uint8_t load_module(uint64_t start)

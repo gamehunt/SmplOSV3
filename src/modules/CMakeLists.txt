@@ -21,3 +21,20 @@ execute_process(
 execute_process(
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/test --target install
 )
+
+ExternalProject_Add(ata
+    PREFIX     ${CMAKE_SOURCE_DIR}/src/ata
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/ata
+    BINARY_DIR ${CMAKE_BINARY_DIR}/ata
+    TMP_DIR    ${CMAKE_BINARY_DIR}/ata-tmp
+    STAMP_DIR  ${CMAKE_BINARY_DIR}/ata-stamp
+)
+
+execute_process(
+    COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR}/src/ata
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/ata
+)
+
+execute_process(
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/ata --target install
+)

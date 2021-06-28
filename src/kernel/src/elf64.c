@@ -142,7 +142,7 @@ static int elf_load_stage1(Elf64_Ehdr *hdr)
                 memset(mem, 0, section->sh_size);
                 // Assign the memory offset to the section offset
                 section->sh_offset = (int)mem - (int)hdr;
-                info("Allocated memory for a section (%ld).", section->sh_size);
+                debug("Allocated memory for a section (%ld).", section->sh_size);
             }
         }
     }
@@ -282,7 +282,7 @@ uint64_t load_elf64(uint64_t start)
     }
     if (ehdr->e_type == ET_EXEC)
     {
-        info("Loading elf executable");
+        debug("Loading elf executable");
         for (int i = 0; i < ehdr->e_phnum + 1; i++)
         {
             Elf64_Phdr *phdr = (Elf64_Phdr *)(start + ehdr->e_phoff + ehdr->e_phentsize * i);
@@ -290,14 +290,14 @@ uint64_t load_elf64(uint64_t start)
             {
                 memset((void *)phdr->p_vaddr, 0, phdr->p_memsz);
                 memcpy((void *)phdr->p_vaddr, (void *)(start + phdr->p_offset), phdr->p_filesz);
-                info("Loaded segment: 0x%llx - 0x%llx", phdr->p_vaddr, phdr->p_vaddr + phdr->p_memsz);
+                debug("Loaded segment: 0x%llx - 0x%llx", phdr->p_vaddr, phdr->p_vaddr + phdr->p_memsz);
             }
         }
         return ehdr->e_entry;
     }
     else if (ehdr->e_type == ET_REL)
     {
-        info("Loading elf relocatable");
+        debug("Loading elf relocatable");
         int result;
         result = elf_load_stage1(ehdr);
         if (result == ELF_RELOC_ERR)

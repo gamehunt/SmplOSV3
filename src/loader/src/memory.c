@@ -20,7 +20,7 @@ uint64_t   pt3[512]            __attribute__((aligned(0x1000)));
 uint64_t   pt4[512]            __attribute__((aligned(0x1000)));
 uint64_t   pt5[512]            __attribute__((aligned(0x1000)));
 
-uint64_t    usr_stack[1024]     __attribute__((aligned(0x1000)));;;
+uint64_t    usr_stack[1024]    __attribute__((aligned(0x1000)));
 
 void add_gdt_entry(int num,uint32_t base,uint32_t limit,uint32_t access,uint32_t gran) {
   gdt[num].base_low = base;
