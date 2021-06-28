@@ -4,6 +4,8 @@
 #include <loader/bootinfo.h>
 #include <memory.h>
 #include <fs/tar.h>
+#include <elf64.h>
+#include <module.h>
 
 extern void      enter_userspace(void *, void *);
 extern uint64_t  sysc();
@@ -46,7 +48,9 @@ void kernel_main(bootinfo_t* bootinfo){
     }
 
     tss_entry_t* tss = (tss_entry_t*)bootinfo->tss;
-    info("Kernel stack at %llx", tss->rsp0);
+    info("Kernel stack at 0x%llx", tss->rsp0);
+
+    export_symbols();
 
     if(CHECK_ADDR(bootinfo->initrd)){
         info("Parsing ramdisk");
@@ -54,7 +58,8 @@ void kernel_main(bootinfo_t* bootinfo){
         for(int i=0;i<parsed->entry_count; i++){
             tar_file_t* file = parsed->entries[i];
             if(endswith(file->filename, ".smpm")){
-                info("Loading module - %s %llx %dB", file->filename, file->start, file->size);
+                info("Loading module - %s 0x%llx %d B", file->filename, file->start, file->size);
+                load_module(file->start);
             }
         }
     }

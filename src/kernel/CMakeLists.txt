@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 MESSAGE(STATUS "Starting kernel build")
-set(CMAKE_C_FLAGS "-m64 -O0 -ffreestanding -z max-page-size=0x1000 -mno-red-zone -mno-mmx -mno-sse -std=gnu99 -mno-sse2 -Wall -Wextra")
+set(CMAKE_C_FLAGS "-m64 -O0 -ffreestanding -fno-pic -z max-page-size=0x1000 -mno-red-zone -mno-mmx -mno-sse -std=gnu99 -mno-sse2 -Wall -Wextra")
 set(CMAKE_ASM_NASM_OBJECT_FORMAT elf64)
 set(CMAKE_C_COMPILER "/usr/bin/x86_64-elf-gcc")
 set(CMAKE_FIND_ROOT_PATH "/usr/x86_64-elf")

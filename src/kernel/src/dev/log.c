@@ -27,7 +27,7 @@ void log(int level, const char *format, va_list args){
     printf("\r\n");
 }
 
-void info(const char *format, ...){
+void info(const char *format, ...) {
     va_list ap;
     va_start(ap, format);
     log(K_KERNEL_LOGLEVEL_INFO, format, ap);

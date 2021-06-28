@@ -2,34 +2,6 @@
 #include <log.h>
 #include <util/string.h>
 
-    
-    /*Elf64_Ehdr *ehdr = (Elf64_Ehdr*)start;
-    Elf64_Shdr *shdr = (Elf64_Shdr*)(start + ehdr->e_shoff);
-    int shnum = ehdr->e_shnum;
-
-    Elf64_Shdr *sh_strtab = &shdr[ehdr->e_shstrndx];
-    Elf64_Shdr *sh_symstrtab;
-    Elf64_Shdr* hdr_symtable;
-    const char *const sh_strtab_p = start + sh_strtab->sh_offset;
-
-    Elf64_Sym  *symtable = 0;
-
-    for (int i = 0; i < shnum; ++i) {
-        info("%2d: %4d '%s'", i, shdr[i].sh_name, sh_strtab_p + shdr[i].sh_name);
-        if(shdr[i].sh_type == SHT_SYMTAB){
-            hdr_symtable = &shdr[i];
-        }
-        if(!strcmp(sh_strtab_p + shdr[i].sh_name, ".strtab")){
-            sh_symstrtab = &shdr[i];
-        }
-    }
-    const char *const sh_symstrtab_p = start + sh_symstrtab->sh_offset;
-    symtable = (Elf64_Sym*)(start + hdr_symtable->sh_offset);
-
-    for(int i=0;i<7;i++){
-        info("%s - 0x%llx - %d", sh_symstrtab_p + symtable[i].st_name, symtable[i].st_value, symtable[i].st_shndx);
-    }*/
-
 uint32_t load_elf64(uint32_t start){
     info("Loading elf from 0x%x", start);
     Elf64_Ehdr* ehdr = (Elf64_Ehdr*)start;

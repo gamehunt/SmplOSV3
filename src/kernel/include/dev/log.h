@@ -2,7 +2,12 @@
 #define K_SMPLOS_LOG_H
 
 #include <stdarg.h>
-#include <util.h>
+
+#if defined(K_SMPLOS_KERNEL)
+    #include <util.h>
+#else
+    #include <kernel/util.h>
+#endif
 
 #define K_KERNEL_LOGLEVEL_INFO  1
 #define K_KERNEL_LOGLEVEL_DEBUG 2

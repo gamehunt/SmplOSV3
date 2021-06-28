@@ -2,6 +2,7 @@
 #define _SYS_ELF64_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 /* Segment types */
 #define PT_NULL		0
@@ -283,6 +284,23 @@ typedef struct elf64_note {
     Elf64_Word n_type;		/* Content type */
 } Elf64_Nhdr;
 
+enum RelocTypes {
+	R_X86_64_NONE		= 0,  // No relocation
+	R_X86_64_64		    = 1,  // Symbol + Offset
+    R_X86_64_PLT32      = 4,  // plt?
+	R_X86_64_PC32		= 2,  // Symbol + Offset - Section Offset
+    R_X86_64_32		    = 10, // Symbol + Offset
+    R_X86_64_32S		= 11, // Symbol + Offset
+};
+
+#define DO_386_32(S, A)	((S) + (A))
+#define DO_386_PC32(S, A, P)	((S) + (A) - (P))
+
+#define ELF_RELOC_ERR -1
+
+int elf_get_symval(Elf64_Ehdr *hdr, int table, uint32_t idx);
+Elf64_Sym* elf_get_symbol(Elf64_Ehdr *target, const char* sname);
+void* elf_get_address(Elf64_Ehdr *hdr, Elf64_Sym* sym);
 uint64_t load_elf64(uint64_t start);
 
 #endif /* _SYS_ELF64_H */
