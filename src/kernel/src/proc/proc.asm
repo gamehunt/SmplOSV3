@@ -12,8 +12,8 @@ enter_userspace:
 	push rdi  ; instruction address to return to
 	iretq
 
-global sysc
-sysc:
-	mov rax, 0
-	int 0x7f
-	ret
+;global sysc
+;sysc:
+;	mov rax, 0
+;	int 0x7f
+;	ret

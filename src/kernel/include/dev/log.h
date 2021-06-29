@@ -9,6 +9,8 @@
     #include <kernel/util.h>
 #endif
 
+#define K_ENABLE_DEBUG
+
 #define K_KERNEL_LOGLEVEL_INFO  1
 #define K_KERNEL_LOGLEVEL_DEBUG 2
 #define K_KERNEL_LOGLEVEL_ERROR 3

@@ -269,7 +269,7 @@ static int elf_load_stage2(Elf64_Ehdr *hdr)
 
 uint64_t load_elf64(uint64_t start)
 {
-    info("Loading elf from 0x%x", start);
+    debug("Loading elf from 0x%x", start);
     Elf64_Ehdr *ehdr = (Elf64_Ehdr *)start;
     if (ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
         ehdr->e_ident[EI_MAG1] != ELFMAG1 ||
@@ -288,8 +288,9 @@ uint64_t load_elf64(uint64_t start)
             Elf64_Phdr *phdr = (Elf64_Phdr *)(start + ehdr->e_phoff + ehdr->e_phentsize * i);
             if (phdr->p_type == 1)
             {
-                memset((void *)phdr->p_vaddr, 0, phdr->p_memsz);
-                memcpy((void *)phdr->p_vaddr, (void *)(start + phdr->p_offset), phdr->p_filesz);
+                void* buffer =  kalloc_f((void *)phdr->p_vaddr, phdr->p_memsz / 4096 + 1, 0, PAGE_FLAG_WRITABLE | PAGE_FLAG_USER);
+                memset(buffer, 0, phdr->p_memsz);
+                memcpy(buffer, (void *)(start + phdr->p_offset), phdr->p_filesz);
                 debug("Loaded segment: 0x%llx - 0x%llx", phdr->p_vaddr, phdr->p_vaddr + phdr->p_memsz);
             }
         }

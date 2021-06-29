@@ -9,10 +9,13 @@ static uint64_t heap_end;
 static memblock_t* free_list = 0;
 
 void*   kalloc (uint64_t start, uint64_t size, uint8_t contigious){
+    return kalloc_f(start,size,contigious, PAGE_FLAG_WRITABLE);
+}
+
+void*   kalloc_f(uint64_t start, uint64_t size, uint8_t contigious, uint16_t flags){
     SUPPRESS_UNUSED(contigious);
-    heap_end = HEAP_START + size * 4096;
     for(uint32_t i=0;i<size;i++){
-        map(falloc(), start + i*4096);
+        mapf(falloc(), start + i*4096, flags);
     }
     return (void*) start;
 }
@@ -137,6 +140,34 @@ void    print_free_list(){
 }
 
 void    init_heap(uint64_t size){
-    kalloc(HEAP_START, size/4096, 0);
+    kalloc_f(HEAP_START, size/4096, 0, PAGE_FLAG_WRITABLE | PAGE_FLAG_GLOBAL);
+    heap_end = HEAP_START + size * 4096;
     info("Initialized heap of size %d MB", size/1024/1024);
+}
+
+void*   krealloc(void* old, uint64_t new_size){
+    memblock_t* block = HDR(old);
+    void* new_mem = kmalloc(new_size);
+    memcpy(new_mem, old, new_size > block->size ? block->size : new_size);
+    kfree(old);
+    return new_mem;
+}
+
+
+void*   kvalloc(uint64_t size, uint64_t alignment){
+	void* p1; // original block
+    void** p2; // aligned block
+    int offset = alignment - 1 + sizeof(void*);
+    if ((p1 = (void*)kmalloc(size + offset)) == NULL)
+    {
+       return NULL;
+    }
+    p2 = (void**)(((size_t)(p1) + offset) & ~(alignment - 1));
+    p2[-1] = p1;
+    return p2;
+}
+
+void kvfree(void* aligned_ptr) {
+    int offset = *(((char*)aligned_ptr) - 1);
+    kfree(((char*)aligned_ptr) - offset);
 }

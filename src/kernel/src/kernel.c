@@ -8,16 +8,6 @@
 #include <module.h>
 #include <dev/pit.h>
 
-extern void      enter_userspace(void *, void *);
-extern uint64_t  sysc();
-
-uint64_t stack[1024];
-
-void gpf(){
-    sysc();
-    while(1){;}
-}
-
 void kernel_main(bootinfo_t* bootinfo){
     info("Reached kernel entrypoint, bootinfo=0x%llx (%d entries, tss=0x%llx)", bootinfo, bootinfo->mem_size, bootinfo->tss);
     setup_interrupts();
@@ -45,28 +35,38 @@ void kernel_main(bootinfo_t* bootinfo){
     info("Mapping framebuffer at 0x%llx", bootinfo->framebuffer);
 
     for(uint32_t i=0;i<1024*768*32;i+=4096){
-        map(bootinfo->framebuffer + i, bootinfo->framebuffer + i);
+        mapf(bootinfo->framebuffer + i, bootinfo->framebuffer + i, PAGE_FLAG_WRITABLE | PAGE_FLAG_USER);
     }
 
     tss_entry_t* tss = (tss_entry_t*)bootinfo->tss;
     info("Kernel stack at 0x%llx", tss->rsp0);
 
     export_symbols();
+    pit_phase(1000);
 
     if(CHECK_ADDR(bootinfo->initrd)){
         info("Parsing ramdisk");
+
+        uint64_t init = 0; 
+
         tar_parsed_t* parsed = tar_parse(bootinfo->initrd);
         for(int i=0;i<parsed->entry_count; i++){
             tar_file_t* file = parsed->entries[i];
             if(endswith(file->filename, ".smpm")){
                 info("Loading module - %s 0x%llx %d B", file->filename, file->start, file->size);
                 load_module(file->start);
+            }else if(endswith(file->filename, ".smpinit")){
+                init = file->start;
             }
+        }
+
+        if(init){
+            exec(init, 1);
         }
     }
 
-    pit_phase(1000);
-
+    
+    asm("cli");
     for(;;) {
         asm("hlt");
     }

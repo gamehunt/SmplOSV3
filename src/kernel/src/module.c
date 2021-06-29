@@ -14,11 +14,11 @@ extern void putchar(char c);
 void export_symbols(){
     export_symbol("putchar", &putchar);
 
-    export_symbol("info", &info);
+    export_symbol("info"   , &info);
     export_symbol("warning", &warning);
-    export_symbol("error", &error);
-    export_symbol("debug", &debug);
-    export_symbol("log", &log);
+    export_symbol("error"  , &error);
+    export_symbol("debug"  , &debug);
+    export_symbol("log"    , &log);
 
     export_symbol("outb", &outb);
     export_symbol("outw", &outw);

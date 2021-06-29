@@ -93,6 +93,22 @@ execute_process(
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/modules
 )
 
+ExternalProject_Add(test_init
+    PREFIX     ${CMAKE_SOURCE_DIR}/src/test_init
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/test_init
+    BINARY_DIR ${CMAKE_BINARY_DIR}/test_init
+    TMP_DIR    ${CMAKE_BINARY_DIR}/test_init-tmp
+    STAMP_DIR  ${CMAKE_BINARY_DIR}/test_init-stamp
+)
+
+execute_process(
+    COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR}/src/test_init
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/test_init
+)
+execute_process(
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/test_init --target install
+)
+
 MESSAGE(STATUS "Creating InitRD")
 
 MESSAGE(STATUS "Cleaning...")

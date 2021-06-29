@@ -22,6 +22,6 @@ typedef struct{
 uint8_t load_module(uint64_t start);
 uint64_t get_kernel_symbol(const char* name);
 void     export_symbol(const char* name, uint64_t address);
-void    export_symbols();
+void     export_symbols();
 
 #endif
