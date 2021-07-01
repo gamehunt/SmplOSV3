@@ -2,6 +2,7 @@
 #include <dev/log.h>
 #include <elf64.h>
 #include <memory.h>
+#include <string.h>
 
 static tss_entry_t* tss;
 extern void      enter_userspace(void *, void *);

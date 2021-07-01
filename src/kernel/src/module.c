@@ -5,6 +5,7 @@
 #include <panic.h>
 #include <subkernel/iface.h>
 #include <io.h>
+#include <string.h>
 
 
 static uint16_t k_sym_ptr = 0;
@@ -37,6 +38,11 @@ void export_symbols(){
     export_symbol("inb", &inb);
     export_symbol("inw", &inw);
     export_symbol("inl", &inl);
+
+    export_symbol("kmalloc", &kmalloc);
+    export_symbol("kfree", &kfree);
+
+    export_symbol("register_dispatcher", &register_dispatcher);
 }
 
 uint8_t load_module(uint64_t start)
