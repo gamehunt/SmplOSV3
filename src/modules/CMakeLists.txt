@@ -9,8 +9,8 @@ ExternalProject_Add(test
     PREFIX     ${CMAKE_SOURCE_DIR}/src/test
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/test
     BINARY_DIR ${CMAKE_BINARY_DIR}/test
-    TMP_DIR    ${CMAKE_BINARY_DIR}/test-tmp
-    STAMP_DIR  ${CMAKE_BINARY_DIR}/test-stamp
+    TMP_DIR    ${CMAKE_BINARY_DIR}/test
+    STAMP_DIR  ${CMAKE_BINARY_DIR}/test
 )
 
 execute_process(
@@ -26,8 +26,8 @@ ExternalProject_Add(ata
     PREFIX     ${CMAKE_SOURCE_DIR}/src/ata
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/ata
     BINARY_DIR ${CMAKE_BINARY_DIR}/ata
-    TMP_DIR    ${CMAKE_BINARY_DIR}/ata-tmp
-    STAMP_DIR  ${CMAKE_BINARY_DIR}/ata-stamp
+    TMP_DIR    ${CMAKE_BINARY_DIR}/ata
+    STAMP_DIR  ${CMAKE_BINARY_DIR}/ata
 )
 
 execute_process(

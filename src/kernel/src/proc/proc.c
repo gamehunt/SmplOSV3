@@ -19,20 +19,23 @@ void schedule(proc_t* proc, regs_t regs){
     memcpy(regs, current_process->context, sizeof(struct registers));
 }
 
-void exec(uint64_t exec_start, uint8_t init){
+void exec(uint64_t exec_start, const char* name, uint8_t init){
     uint64_t entry = load_elf64(exec_start);
     if(CHECK_ADDR(entry)){
         proc_t* proc        = kmalloc(sizeof(proc_t));
-        proc->pid           = 0;
-        proc->name          = "init";
+
+        proc->pid           = process_count;
+        proc->name          = name;
         proc->address_space = (uint64_t)copy_address_space(get_kernel_address_space());
         proc->kernel_stack  = (uint64_t)kvalloc(KERNEL_STACK_SIZE, 4096) + KERNEL_STACK_SIZE; 
         proc->stack         = USR_STACK + USR_STACK_SIZE;
         proc->context       = kmalloc(sizeof(struct registers));
+
         uint64_t prev_space = get_current_address_space();
         set_address_space(proc->address_space, 0);
         kalloc_f(USR_STACK, USR_STACK_SIZE/4096, 0, PAGE_FLAG_WRITABLE | PAGE_FLAG_USER);
         set_address_space(prev_space, 0);
+        
         if(init){
             set_kernel_stack(proc->kernel_stack);
             set_address_space(proc->address_space, 0);
@@ -40,7 +43,7 @@ void exec(uint64_t exec_start, uint8_t init){
             processes[process_count] = proc;
             current_process = proc;
             process_count++;
-            
+
             enter_userspace(entry, proc->stack);
         }
     }

@@ -13,6 +13,11 @@ project(SmplOSV3-exo-module-test VERSION 1.0)
 add_link_options(-r -ffreestanding -nostdlib -lgcc)
 FILE(GLOB C_SRCS src/*.c src/**/*.c)
 FILE(GLOB ASM_SRC src/*.asm src/**/*.asm)
-ADD_EXECUTABLE(test.smpm ${ASM_SRC} ${C_SRCS})
-target_link_libraries(test.smpm libk.a)
-INSTALL(TARGETS test.smpm DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../../../../initrd/)
+ADD_EXECUTABLE(ata.smpm ${ASM_SRC} ${C_SRCS})
+target_link_libraries(ata.smpm libk.a)
+INSTALL(TARGETS ata.smpm DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../../../../initrd/)
+INSTALL (
+    DIRECTORY   ${CMAKE_SOURCE_DIR}/include/
+    DESTINATION ${CMAKE_SOURCE_DIR}/../../../../sysroot/include/kernel
+    FILES_MATCHING PATTERN "*.h*"
+)

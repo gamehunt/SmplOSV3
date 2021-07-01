@@ -19,7 +19,7 @@ void irq0_listener(regs_t regs);
 
 void schedule(proc_t* proc, regs_t regs);
 
-void exec(uint64_t exec_start, uint8_t init);
+void exec(uint64_t exec_start, const char* name, uint8_t init);
 
 void set_tss(tss_entry_t* tss);
 void set_kernel_stack(uint64_t stack);

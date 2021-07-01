@@ -3,10 +3,23 @@
 
 #include <stdint.h>
 
-typedef struct{
-    uint16_t sector_size;
-}disk_sector_dispatcher_t;
+#if defined(K_SMPLOS_KERNEL)
+    #include <util.h>
+#else
+    #include <kernel/util.h>
+#endif
 
-void set_disk_sector_dispatcher(disk_sector_dispatcher_t* dispatcher);
+typedef struct{
+    uint8_t idx;
+    void* (*alloc)(uint64_t size, void* meta);
+    void* (*free) (void* ptr, void* meta);
+}resource_dispatcher_t;
+
+CH_START
+
+uint8_t register_dispatcher(resource_dispatcher_t* dispatcher);
+resource_dispatcher_t* get_dispatcher(uint8_t idx);
+
+CH_END
 
 #endif

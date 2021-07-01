@@ -6,8 +6,18 @@
 #include <subkernel/iface.h>
 #include <io.h>
 
+
 static uint16_t k_sym_ptr = 0;
 static k_sym_t k_symtable[256];
+
+static module_header_t* modules[256];
+static uint8_t modules_ptr = 0;
+
+static const char* required_modules[] = {
+    "ata",
+};
+
+static uint8_t required_modules_left = REQUIRED_MODULES_TOTAL;
 
 extern void putchar(char c);
 
@@ -27,8 +37,6 @@ void export_symbols(){
     export_symbol("inb", &inb);
     export_symbol("inw", &inw);
     export_symbol("inl", &inl);
-
-    export_symbol("set_disk_sector_dispatcher", &set_disk_sector_dispatcher);
 }
 
 uint8_t load_module(uint64_t start)
@@ -38,8 +46,25 @@ uint8_t load_module(uint64_t start)
         Elf64_Ehdr *hdr = start;
         module_header_t *mhdr = elf_get_address(hdr, elf_get_symbol(hdr, "__k_module_header"));
         if(mhdr || mhdr->magic != SMPLOS_MODULE_MAGIC){
+            if(!strlen(mhdr->name)){
+                error("Module's name is empty! Skipping...");
+            }else{
             info("Loading module '%s'...", mhdr->name);
-            return mhdr->load();
+                if(!mhdr->load()){
+                    modules[modules_ptr] = mhdr;
+                    modules_ptr++;
+
+                    if(required_modules_left){
+                        for(int i=0;i<REQUIRED_MODULES_TOTAL;i++){
+                            if(strlen(required_modules[i]) && !strcmp(mhdr->name, required_modules[i])){
+                                required_modules[i] = "";
+                                required_modules_left--;
+                            }
+                        }
+                    }
+
+                }
+            }
         }else{
             error("Failed to load module: header not found or invalid!");
             return 1;
@@ -48,6 +73,14 @@ uint8_t load_module(uint64_t start)
         error("Failed to load module: faulty elf");
         return 1;
     }
+}
+
+uint8_t check_required_modules(){
+    return required_modules_left == 0;
+}
+
+const char** get_required_modules_left(){
+    return required_modules;
 }
 
 uint64_t get_kernel_symbol(const char* name){

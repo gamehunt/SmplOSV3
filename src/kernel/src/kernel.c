@@ -60,9 +60,24 @@ void kernel_main(bootinfo_t* bootinfo){
             }
         }
 
-        if(init){
-            exec(init, 1);
+        if(!check_required_modules()){
+            error("Not all required modules have been loaded, halting kernel.");
+            error("Faulty/Non-existent modules:");
+            const char** required = get_required_modules_left();
+            for(int i=0;i<REQUIRED_MODULES_TOTAL;i++){
+                if(strlen(required[i])){
+                    error("* %s", required[i]);
+                }
+            }
+        }else{
+            if(init){
+                exec(init, "init", 1);
+            }else{
+                error("Can't find initial executable, halting kernel.");
+            }
         }
+    }else{
+        error("Ramdisk not found, halting kernel.");
     }
 
     

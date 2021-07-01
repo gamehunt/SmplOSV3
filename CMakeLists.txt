@@ -8,6 +8,8 @@ MESSAGE(STATUS "Cleaning...")
 execute_process(
     COMMAND rm -rf build
     COMMAND rm -rf sysroot
+    COMMAND rm -rf initrd
+    COMMAND mkdir  initrd
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     ERROR_QUIET
 )
@@ -16,8 +18,8 @@ ExternalProject_Add(loader
     PREFIX     ${CMAKE_SOURCE_DIR}/src/loader
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/loader
     BINARY_DIR ${CMAKE_BINARY_DIR}/loader
-    TMP_DIR    ${CMAKE_BINARY_DIR}/loader-tmp
-    STAMP_DIR  ${CMAKE_BINARY_DIR}/loader-stamp
+    TMP_DIR    ${CMAKE_BINARY_DIR}/loader
+    STAMP_DIR  ${CMAKE_BINARY_DIR}/loader
 )
 
 execute_process(
@@ -32,8 +34,8 @@ ExternalProject_Add(libk
     PREFIX     ${CMAKE_SOURCE_DIR}/src/libc
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libc
     BINARY_DIR ${CMAKE_BINARY_DIR}/libk
-    TMP_DIR    ${CMAKE_BINARY_DIR}/libk-tmp
-    STAMP_DIR  ${CMAKE_BINARY_DIR}/libk-stamp
+    TMP_DIR    ${CMAKE_BINARY_DIR}/libk
+    STAMP_DIR  ${CMAKE_BINARY_DIR}/libk
 )
 
 execute_process(
@@ -48,8 +50,8 @@ ExternalProject_Add(libc
     PREFIX     ${CMAKE_SOURCE_DIR}/src/libc
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/libc
     BINARY_DIR ${CMAKE_BINARY_DIR}/libc
-    TMP_DIR    ${CMAKE_BINARY_DIR}/libc-tmp
-    STAMP_DIR  ${CMAKE_BINARY_DIR}/libc-stamp
+    TMP_DIR    ${CMAKE_BINARY_DIR}/libc
+    STAMP_DIR  ${CMAKE_BINARY_DIR}/libc
 )
 
 execute_process(
@@ -65,8 +67,8 @@ ExternalProject_Add(kernel
     PREFIX     ${CMAKE_SOURCE_DIR}/src/kernel
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/kernel
     BINARY_DIR ${CMAKE_BINARY_DIR}/kernel
-    TMP_DIR    ${CMAKE_BINARY_DIR}/kernel-tmp
-    STAMP_DIR  ${CMAKE_BINARY_DIR}/kernel-stamp
+    TMP_DIR    ${CMAKE_BINARY_DIR}/kernel
+    STAMP_DIR  ${CMAKE_BINARY_DIR}/kernel
 )
 
 execute_process(
@@ -81,8 +83,8 @@ ExternalProject_Add(modules
     PREFIX     ${CMAKE_SOURCE_DIR}/src/modules
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/modules
     BINARY_DIR ${CMAKE_BINARY_DIR}/modules
-    TMP_DIR    ${CMAKE_BINARY_DIR}/modules-tmp
-    STAMP_DIR  ${CMAKE_BINARY_DIR}/modules-stamp
+    TMP_DIR    ${CMAKE_BINARY_DIR}/modules
+    STAMP_DIR  ${CMAKE_BINARY_DIR}/modules
 )
 
 execute_process(
@@ -93,20 +95,20 @@ execute_process(
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/modules
 )
 
-ExternalProject_Add(test_init
-    PREFIX     ${CMAKE_SOURCE_DIR}/src/test_init
-    SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/test_init
-    BINARY_DIR ${CMAKE_BINARY_DIR}/test_init
-    TMP_DIR    ${CMAKE_BINARY_DIR}/test_init-tmp
-    STAMP_DIR  ${CMAKE_BINARY_DIR}/test_init-stamp
+ExternalProject_Add(subkernels
+    PREFIX     ${CMAKE_SOURCE_DIR}/src/subkernels
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/subkernels
+    BINARY_DIR ${CMAKE_BINARY_DIR}/subkernels
+    TMP_DIR    ${CMAKE_BINARY_DIR}/subkernels
+    STAMP_DIR  ${CMAKE_BINARY_DIR}/subkernels
 )
 
 execute_process(
-    COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR}/src/test_init
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/test_init
+    COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR}/src/subkernels
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/subkernels
 )
 execute_process(
-    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/test_init --target install
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/subkernels
 )
 
 MESSAGE(STATUS "Creating InitRD")

@@ -14,7 +14,6 @@ uint8_t unload(){
 }
 
 uint8_t load(){
-    set_disk_sector_dispatcher(0);
     info("ATA module loaded");
     return 0;
 }  
