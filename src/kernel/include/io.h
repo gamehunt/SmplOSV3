@@ -1,7 +1,12 @@
 #ifndef __K_SMPLOS_IO_H
 #define __K_SMPLOS_IO_H
 
-#include <util.h>
+#if defined(K_SMPLOS_KERNEL)
+    #include <util.h>
+#else
+    #include <kernel/util.h>
+#endif
+
 #include <stdint.h>
 
 CH_START

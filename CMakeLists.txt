@@ -95,22 +95,6 @@ execute_process(
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/modules
 )
 
-ExternalProject_Add(subkernels
-    PREFIX     ${CMAKE_SOURCE_DIR}/src/subkernels
-    SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/subkernels
-    BINARY_DIR ${CMAKE_BINARY_DIR}/subkernels
-    TMP_DIR    ${CMAKE_BINARY_DIR}/subkernels
-    STAMP_DIR  ${CMAKE_BINARY_DIR}/subkernels
-)
-
-execute_process(
-    COMMAND ${CMAKE_COMMAND} ${CMAKE_SOURCE_DIR}/src/subkernels
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/subkernels
-)
-execute_process(
-    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/subkernels
-)
-
 MESSAGE(STATUS "Creating InitRD")
 
 MESSAGE(STATUS "Cleaning...")

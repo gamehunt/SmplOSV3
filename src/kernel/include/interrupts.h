@@ -29,8 +29,10 @@ void setup_idt();
 void setup_pic();
 void set_gate(uint8_t num, uint64_t base, uint8_t sel, uint8_t flags);
 
-void set_isr_handler(interrupt_handler_t handler, uint8_t interrupt);
-void set_irq_handler(interrupt_handler_t handler, uint8_t interrupt);
+void set_isr_handler(uint8_t interrupt, interrupt_handler_t handler);
+void set_irq_handler(uint8_t interrupt, interrupt_handler_t handler);
+
+void irq_end(uint8_t int_no);
 
 CH_END
 

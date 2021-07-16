@@ -1,28 +1,30 @@
 #include <module.h>
 #include <dev/log.h>
+#include <interrupts.h>
 #include <elf64.h>
 #include <memory.h>
 #include <panic.h>
-#include <subkernel/iface.h>
 #include <io.h>
 #include <string.h>
+#include <types/dyn_array.h>
 
 
-static uint16_t k_sym_ptr = 0;
-static k_sym_t k_symtable[256];
-
-static module_header_t* modules[256];
-static uint8_t modules_ptr = 0;
+DEFINE_DYN_ARRAY(k_sym_t*, k_symtable)
+DEFINE_DYN_ARRAY(module_header_t*, modules)
 
 static const char* required_modules[] = {
     "ata",
 };
 
 static uint8_t required_modules_left = REQUIRED_MODULES_TOTAL;
+static uint8_t __are_modules_initialized = 0;
 
 extern void putchar(char c);
 
 void export_symbols(){
+
+    INIT_DYN_ARRAY(k_symtable, 256);
+
     export_symbol("putchar", &putchar);
 
     export_symbol("info"   , &info);
@@ -42,11 +44,16 @@ void export_symbols(){
     export_symbol("kmalloc", &kmalloc);
     export_symbol("kfree", &kfree);
 
-    export_symbol("register_dispatcher", &register_dispatcher);
+    export_symbol("set_irq_handler", &set_irq_handler);
+    export_symbol("irq_end", &irq_end);
 }
 
 uint8_t load_module(uint64_t start)
 {
+    if(!__are_modules_initialized){
+        INIT_DYN_ARRAY(modules, 256);
+        __are_modules_initialized = 1;
+    }
     if (!load_elf64(start))
     {
         Elf64_Ehdr *hdr = start;
@@ -57,9 +64,7 @@ uint8_t load_module(uint64_t start)
             }else{
             info("Loading module '%s'...", mhdr->name);
                 if(!mhdr->load()){
-                    modules[modules_ptr] = mhdr;
-                    modules_ptr++;
-
+                    DYN_ARRAY_ADD(modules, mhdr)
                     if(required_modules_left){
                         for(int i=0;i<REQUIRED_MODULES_TOTAL;i++){
                             if(strlen(required_modules[i]) && !strcmp(mhdr->name, required_modules[i])){
@@ -90,20 +95,18 @@ const char** get_required_modules_left(){
 }
 
 uint64_t get_kernel_symbol(const char* name){
-    for(int i=0;i<k_sym_ptr;i++){
-        if(!strcmp(k_symtable[i].name, name)){
-            return k_symtable[i].address;
+    for(int i=0;i<DYN_ARRAY_SIZE(k_symtable);i++){
+        k_sym_t* sym = DYN_ARRAY_GET(k_symtable, i);
+        if(!strcmp(sym->name, name)){
+            return sym->address;
         }
     }
     return NULL;
 }
 
 void     export_symbol(const char* name, uint64_t address){
-    if(k_sym_ptr >= 256){
-        panic(NULL, "Symtable overflow");
-        return;
-    }
-    k_symtable[k_sym_ptr].name = name;
-    k_symtable[k_sym_ptr].address = address;
-    k_sym_ptr++;
+    k_sym_t* sym = kmalloc(sizeof(k_sym_t));
+    sym->name = name;
+    sym->address = address;
+    DYN_ARRAY_ADD(k_symtable, sym);
 }

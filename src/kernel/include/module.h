@@ -21,6 +21,7 @@ typedef struct{
     module_header_t __k_module_header = {SMPLOS_MODULE_MAGIC, name, load, unload};
 
 uint8_t load_module(uint64_t start);
+uint8_t load_ramdisk();
 uint8_t check_required_modules();
 const char** get_required_modules_left();
 uint64_t get_kernel_symbol(const char* name);
