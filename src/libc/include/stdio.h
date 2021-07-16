@@ -1,3 +1,6 @@
+#ifndef __LIBC_STDIO
+#define __LIBC_STDIO
+
 #include <stdarg.h>
 #include <stddef.h>
 
@@ -72,4 +75,6 @@ int fctprintf(void (*out)(char character, void* arg), void* arg, const char* for
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

@@ -20,12 +20,19 @@ static uint8_t required_modules_left = REQUIRED_MODULES_TOTAL;
 static uint8_t __are_modules_initialized = 0;
 
 extern void putchar(char c);
+extern void* __libk_malloc(size_t);
+extern void  __libk_free(void*);
+extern void  __libk_assertion_fail(const char*, const char*, int);
 
 void export_symbols(){
 
     INIT_DYN_ARRAY(k_symtable, 256);
 
     export_symbol("putchar", &putchar);
+
+    export_symbol("__libk_malloc", &__libk_malloc);
+    export_symbol("__libk_free",   &__libk_free);
+    export_symbol("__libk_assertion_fail", &__libk_assertion_fail);
 
     export_symbol("info"   , &info);
     export_symbol("warning", &warning);

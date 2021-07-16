@@ -64,6 +64,7 @@ void *kmalloc(uint64_t size)
     memblock_t *free_block = find_free_block(size);
     if (!free_block)
     {
+        //info("%")
         if ((uint64_t)heap_top + size + sizeof(memblock_t) > heap_end)
         {
             panic(NULL, "Out of memory");

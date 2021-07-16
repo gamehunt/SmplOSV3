@@ -1,5 +1,6 @@
 #include <util.h>
 #include <string.h>
+#include <assert.h>
 
 void halt(){
 	asm("cli; hlt");

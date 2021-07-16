@@ -24,7 +24,7 @@
 #define CHECK_ADDR(x) (to_physical(x) != 0)
 
 #define USR_STACK   0x1000000
-#define HEAP_START  0xA00000000
+#define HEAP_START  0xB00000
 
 #define USR_STACK_SIZE    MB(4)
 #define KERNEL_STACK_SIZE MB(2)

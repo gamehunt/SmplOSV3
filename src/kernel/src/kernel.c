@@ -8,7 +8,10 @@
 #include <fs/tar.h>
 #include <elf64.h>
 #include <module.h>
+#include <stdlib.h>
 
+#define SHORT_ASSERT
+#include <assert.h>
 
 void kernel_main(bootinfo_t *bootinfo)
 {

@@ -16,7 +16,11 @@
 
 #include <stdint.h>
 
+CH_START
+
 void halt();
 uint8_t endswith(const char *str, const char *suffix);
+
+CH_END
 
 #endif
