@@ -14,6 +14,7 @@ uint8_t unload();
 SMPLOS_MODULE("ata", load, unload)
 
 static ata_device_t* ata_devices[4];
+static char letter = 'a';
 
 uint16_t ata_get_iobase(ata_device_t* dev){
     return dev->bus ? ATA_SECONDARY_IO_BASE : ATA_PRIMARY_IO_BASE;
@@ -127,7 +128,6 @@ uint8_t unload(){
 
 uint8_t load()
 {
-
     ata_reset(0);
     ata_reset(1);
 
@@ -166,6 +166,12 @@ uint8_t load()
                                                                                    ata_device->lba48 ? ata_device->lba48_sectors : ata_device->lba28_sectors, 
                                                                                    ata_device->dma_active, 
                                                                                    ata_device->dma_available);
+                char path[128];
+                sprintf(path, "/dev/sd%c", letter);
+                letter++;
+                if(kcreate(path, 0)){
+                    info("Created device: %s", path);
+                }
             }
         }
     }

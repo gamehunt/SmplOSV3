@@ -3,10 +3,10 @@
 
 #include <stdint.h>
 
-#define DEFINE_STACK(type, name)                      \
-    typedef struct stack_##name{               \
-        uint32_t   esp;                               \
-        type*      stack;                             \
+#define DEFINE_STACK(type, name)             \
+    typedef struct stack_##name{             \
+        uint32_t   esp;                      \
+        type*      stack;                    \
     }stack_##name##_t;                       \
     stack_##name##_t name;                   \
     static type __##name##_stack_size_helper;                      
@@ -15,11 +15,11 @@
     name.esp = 0;               \
     name.stack = kmalloc(sizeof(__##name##_stack_size_helper)*size);
 
-#define STACK_PUSH(name, val)         \
+#define STACK_PUSH(name, val)   \
     name.stack[name.esp] = val; \
     name.esp++;
 
-#define STACK_POP(name)           \
+#define STACK_POP(name)     \
     name.stack[name.esp-1]; \
     name.esp--;
 

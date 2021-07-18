@@ -82,7 +82,8 @@ void *kmalloc(uint64_t size)
     }
     if (free_block->next && free_block->prev)
     {
-        free_block->prev->next = free_block->next->prev;
+        free_block->prev->next = free_block->next;
+        free_block->next->prev = free_block->prev;
     }
     else if (free_block->prev)
     {

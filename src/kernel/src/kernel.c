@@ -1,6 +1,7 @@
 #include <dev/log.h>
 #include <dev/pit.h>
 #include <dev/pci.h>
+#include <dev/vfs.h>
 #include <util.h>
 #include <interrupts.h>
 #include <loader/bootinfo.h>
@@ -53,7 +54,7 @@ void kernel_main(bootinfo_t *bootinfo)
     info("Kernel stack at 0x%llx", tss->rsp0);
 
     pci_init();
-    //while(1);
+    vfs_init();
 
     export_symbols();
     pit_phase(1000);
@@ -108,6 +109,8 @@ void kernel_main(bootinfo_t *bootinfo)
     {
         error("Ramdisk not found, halting kernel.");
     }
+
+    vfs_print_tree();
 
     for (;;)
     {

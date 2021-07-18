@@ -1,5 +1,6 @@
 #include <module.h>
 #include <dev/log.h>
+#include <dev/vfs.h>
 #include <interrupts.h>
 #include <elf64.h>
 #include <memory.h>
@@ -53,6 +54,13 @@ void export_symbols(){
 
     export_symbol("set_irq_handler", &set_irq_handler);
     export_symbol("irq_end", &irq_end);
+
+    export_symbol("kcreate", &kcreate);
+    export_symbol("kread", &kread);
+    export_symbol("kwrite", &kwrite);
+    export_symbol("kmount", &kmount);
+
+    export_symbol("vfs_print_tree", &vfs_print_tree);
 }
 
 uint8_t load_module(uint64_t start)

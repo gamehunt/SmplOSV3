@@ -34,6 +34,15 @@ char * strcpy(char *strDest, const char *strSrc)
     return temp;
 }
 
+char * strcat(char *dest, const char *src){
+    char *rdest = dest;
+    while (*dest)
+      dest++;
+    while (*dest++ = *src++)
+        ;
+    return rdest;
+}
+
 int strlen(const char* str){
 	int size = 0;
 	while(str[size] != '\0'){
@@ -101,12 +110,13 @@ size_t strcspn(const char *s1, const char *s2)
 
 char* strtok(char *str, const char* delim) {
     static char* p=0;
-    if(str)
-        p=str;
-    else if(!p)
+    if(str){
+        p = str;
+    }else if(!p){
         return 0;
-    str=p+strspn(p,delim);
-    p=str+strcspn(str,delim);
+    }
+    str = p   + strspn(p,delim);
+    p   = str + strcspn(str,delim);
     if(p==str)
         return p=0;
     p = *p ? *p=0,p+1 : 0;
@@ -115,13 +125,8 @@ char* strtok(char *str, const char* delim) {
 
 char *strdup(char *src)
 {
-    char *str;
-    int len;
-    while (src[len])
-        len++;
-        str = (char*)malloc(sizeof(*str) * (len+1));
-    while (*src)
-        *str++ = *src++;
-    *str = '\0';
+    int len = strlen(src);
+    char * str = (char*)malloc(sizeof(char) * (len+1));
+    strcpy(str, src);
     return (str);
 }

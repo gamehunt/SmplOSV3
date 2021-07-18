@@ -6,6 +6,7 @@
 
 int strcmp(const char* s1, const char* s2);
 char * strcpy(char *strDest, const char *strSrc);
+char * strcat(char *dest, const char *src);
 int strlen(const char* str);
 int strncmp(const char *str1, const char *str2, size_t n);
 char* strtok(char *str, const char* delim);
