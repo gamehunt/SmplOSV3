@@ -18,10 +18,9 @@ vfs_node_t* vfs_create_node(const char* name, void* inode, uint8_t type, vfs_nod
     node->fs_type      = type;
     node->inode        = inode;
     node->device       = 0;
-    node->childs_count = 0;
-    node->childs       = 0;
 
     node->dirent       = kmalloc(sizeof(vfs_dirent_t));
+    memset(node->dirent, 0, sizeof(vfs_dirent_t));
 
     if(parent){
         vfs_add_child(parent, node);
@@ -49,9 +48,9 @@ uint8_t     vfs_add_child(vfs_node_t* parent, vfs_node_t* child){
     if(!parent->dirent->childs_count){
         parent->dirent->childs = kmalloc(sizeof(vfs_node_t*));
     }else{
-        parent->dirent->childs = krealloc(parent->childs, sizeof(vfs_node_t*)*(parent->childs_count + 1));
+        parent->dirent->childs = krealloc(parent->dirent->childs, sizeof(vfs_node_t*)*(parent->dirent->childs_count + 1));
     }
-    parent->dirent->childs[parent->childs_count] = child;
+    parent->dirent->childs[parent->dirent->childs_count] = child;
     parent->dirent->childs_count++;
     child->dirent->parent = parent;
     return 0;
@@ -218,8 +217,8 @@ static void vfs_print_node(vfs_node_t* node, int spaces){
         buffer[i] = '-';
     }
     printf("%s%s\n\r", buffer, node->name);
-    for(int i=0;i<node->childs_count;i++){
-        vfs_print_node(node->childs[i], spaces+1);
+    for(int i=0;i<node->dirent->childs_count;i++){
+        vfs_print_node(node->dirent->childs[i], spaces+1);
     }
 }
 
