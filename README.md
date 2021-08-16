@@ -1,2 +1,2 @@
 # SmplosV3
-exo
+Third rewrite of my OS, now on x86_64 and cmake build system
