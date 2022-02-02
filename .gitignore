@@ -6,6 +6,7 @@
 *.ko
 *.obj
 *.elf
+*.EFI
 
 # Linker output
 *.ilk
