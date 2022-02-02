@@ -1,1 +1,0 @@
-sudo cmake . -Bbuild && sync
