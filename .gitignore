@@ -60,3 +60,4 @@ mount
 disk.img
 ramdisk.initrd
 initrd
+bootloader/uefi
