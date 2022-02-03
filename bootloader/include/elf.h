@@ -5,8 +5,6 @@
 #ifndef _BOOTLOADER_ELF_H
 #define _BOOTLOADER_ELF_H
 
-#include <stdint.h>
-
 /* Segment types */
 #define PT_NULL		0
 #define PT_LOAD		1
@@ -184,6 +182,12 @@
 #define ELFOSABI_NONE   0
 #define ELFOSABI_LINUX  3
 
+#ifndef _SMPLOS_BOOTLOADER
+    #error "Dont use this header for anything, that is not bootloader"
+#endif
+
+#include <commons.h>
+
 /* ELF standard typedefs (yet more proof that <stdint.h> was way overdue) */
 typedef uint16_t Elf64_Half;
 typedef int16_t Elf64_SHalf;
@@ -286,5 +290,12 @@ typedef struct elf64_note {
     Elf64_Word n_descsz;	/* Content size */
     Elf64_Word n_type;		/* Content type */
 } Elf64_Nhdr;
+
+#define ELF_ERR_SUCCESS        0
+#define ELF_ERR_READ_FAILED    1
+#define ELF_ERR_INVALID_FORMAT 2
+#define ELF_ERR_GENERIC        255
+
+BSTATUS load_elf(const char* path, uintptr_t* entry);
 
 #endif /* _BOOTLOADER_ELF_H */

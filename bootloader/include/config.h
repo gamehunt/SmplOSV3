@@ -14,13 +14,8 @@ struct config_node{
     char* value;
 };
 
-struct config_error{
-    BSTATUS status;
-    char* description;
-};
-
 struct config_result{
-    struct config_error error;
+    BSTATUS status;
     uint32_t child_count;
     struct config_node* childs;
 };
