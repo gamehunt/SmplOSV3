@@ -9,20 +9,21 @@ all: build install launch
 
 build: clean prepare bootloader kernel
 
-prepare:
+prepare: clean
 	mkdir build
+	mkdir build/include
 	test -r /usr/share/ovmf/OVMF.fd && cp /usr/share/ovmf/OVMF.fd build/
 	sudo mkdir /mnt/smplos || :
 	cd bootloader && (test -h uefi || ln -s ../posix-uefi/uefi)
 
-bootloader:
+bootloader: prepare
 	make -C bootloader
 	make -C bootloader install
 
 bootloader-clean:
 	make -C bootloader clean || :
 
-kernel:
+kernel: bootloader
 	make -C kernel
 	make -C kernel install
 
@@ -68,5 +69,8 @@ launch: check-ovmf install
 
 install: mount-disk
 	sudo mkdir -p /mnt/smplos/EFI/BOOT/
+	sudo mkdir -p /mnt/smplos/smplos/
 	sudo cp build/BOOTX64.EFI /mnt/smplos/EFI/BOOT/
+	sudo cp build/smplos.elf  /mnt/smplos/smplos/smplos.elf
+	sudo cp boot.cfg /mnt/smplos/smplos/
 	sync
