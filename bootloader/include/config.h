@@ -1,6 +1,10 @@
 #ifndef _BOOTLOADER_CONFIG_H
 #define _BOOTLOADER_CONFIG_H
 
+#ifndef _SMPLOS_BOOTLOADER
+    #error "Dont use this header for anything, that is not bootloader"
+#endif
+
 #include <commons.h>
 
 #define CFG_ERR_SUCCESS         0

@@ -3,7 +3,8 @@
 #include <shared.h>
 #include <stddef.h>
 #include <elf.h>
-
+#include <bootinfo.h>
+#include <mem.h>
 
 int main(int argc, char **argv)
 {
@@ -54,6 +55,13 @@ int main(int argc, char **argv)
         free(data.childs);
     }
 
+    if(!strlen(kernel_path)){
+        b_warn("Failed to find kernel entry, falling back to default");
+        strcpy(kernel_path, "\\smplos\\smplos.elf");
+    }
+
+    b_setup_paging();
+
     uintptr_t entry;
     BSTATUS s;
     if((s = load_elf(kernel_path, &entry))){
@@ -71,10 +79,17 @@ int main(int argc, char **argv)
                 break;
         }
         b_error("Failed to load kernel: %s", msg);
+        return 0;
     }else{
-        b_info("Kernel entry point: 0x%x\n", entry);
+        b_info("Kernel entry point: 0x%x", entry);
     }
 
-    getchar();
+    bootinfo_t bi;
+    if(exit_bs()){
+        b_error("Failed to exit boot services!");
+    }else{
+        ((void (*)(bootinfo_t*))(entry))(&bi);
+    }
+
     return 0;
 }

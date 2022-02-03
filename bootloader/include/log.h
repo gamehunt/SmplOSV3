@@ -5,6 +5,10 @@
 #define B_LOG_WARN  1
 #define B_LOG_ERR   2
 
+#ifndef _SMPLOS_BOOTLOADER
+    #error "Dont use this header for anything, that is not bootloader"
+#endif
+
 #include <commons.h>
 
 void b_vlog(BLOGLEVEL level, const char* format, va_list ptr);
