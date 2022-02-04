@@ -292,10 +292,9 @@ typedef struct elf64_note {
 } Elf64_Nhdr;
 
 #define ELF_ERR_SUCCESS        0
-#define ELF_ERR_READ_FAILED    1
 #define ELF_ERR_INVALID_FORMAT 2
 #define ELF_ERR_GENERIC        255
 
-BSTATUS load_elf(const char* path, uintptr_t* entry);
+BSTATUS load_elf(char* buff, uintptr_t* entry);
 
 #endif /* _BOOTLOADER_ELF_H */

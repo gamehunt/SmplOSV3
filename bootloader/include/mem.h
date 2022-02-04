@@ -7,8 +7,6 @@
 
 #include <commons.h>
 
-BSTATUS b_map_range(uint64_t start, uint64_t size_in_pages, uint8_t ident);
-
 void b_set_pml(uint64_t addr);
 uint64_t* b_get_pml();
 

@@ -13,7 +13,7 @@ int main(int argc, char **argv)
 
     ST->ConOut->ClearScreen(ST->ConOut);
     ST->BootServices->SetWatchdogTimer(0, 0, 0, NULL);
-    
+
     b_info("SmplOSV3.1 Loader started");
     b_info("Trying to parse boot.cfg...");
 
@@ -60,18 +60,38 @@ int main(int argc, char **argv)
         strcpy(kernel_path, "\\smplos\\smplos.elf");
     }
 
+    FILE *f;
+    char *buff;
+    long int size;
+
+    if((f = fopen(kernel_path, "r"))) {
+        fseek(f, 0, SEEK_END);
+        size = ftell(f);
+
+        fseek(f, 0, SEEK_SET);
+        buff = malloc(size + 1);
+
+        if(!buff) {
+            b_error("Malloc failure");
+            return 0;
+        }
+
+        fread(buff, size, 1, f);
+        fclose(f);
+    }else{
+        b_error("Failed to load kernel: Failed to read file");
+        return 0;
+    }
+
     b_setup_paging();
 
     uintptr_t entry;
     BSTATUS s;
-    if((s = load_elf(kernel_path, &entry))){
+    if((s = load_elf(buff, &entry))){
         char* msg;
         switch(s){
             case ELF_ERR_INVALID_FORMAT:
                 msg = "Invalid format";
-                break;
-            case ELF_ERR_READ_FAILED:
-                msg = "Failed to read file";
                 break;
             case ELF_ERR_GENERIC:
             default:
