@@ -1,9 +1,9 @@
 ENTRY(_start)
 SECTIONS
 {
-    . = 0xF000000000000000;
+    . = 0xFFFFFF7F00000000;
 
-    .text : AT(ADDR(.text) - 0xF000000000000000)
+    .text : AT(ADDR(.text) - 0xFFFFFF7F00000000)
     {
         _code = .;
         *(.text)
@@ -11,21 +11,21 @@ SECTIONS
         . = ALIGN(4096);
     }
 
-   .data : AT(ADDR(.data) - 0xF000000000000000)
+   .data : AT(ADDR(.data) - 0xFFFFFF7F00000000)
    {
         _data = .;
         *(.data)
         . = ALIGN(4096);
    }
 
-   .eh_frame : AT(ADDR(.eh_frame) - 0xF000000000000000)
+   .eh_frame : AT(ADDR(.eh_frame) - 0xFFFFFF7F00000000)
    {
        _ehframe = .;
        *(.eh_frame)
         . = ALIGN(4096);
    }
 
-   .bss : AT(ADDR(.bss) - 0xF000000000000000)
+   .bss : AT(ADDR(.bss) - 0xFFFFFF7F00000000)
    {
        _bss = .;
        *(.bss)
