@@ -27,7 +27,7 @@ $(TARGET): $(OBJS)
 all: $(TARGET)
 
 clean:
-    rm $(OBJS) || :
+	rm $(OBJS) || :
 	rm $(TARGET) || :
 
 install: 

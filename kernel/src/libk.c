@@ -4,6 +4,7 @@
 #include <dev/serial.h>
 
 #include <string.h>
+#include <stdio.h>
 
 void* __libk_malloc(size_t s){
     UNUSED(s);
@@ -18,8 +19,12 @@ void  __libk_assertion_fail(const char *msg, const char *file, int line){
     UNUSED(file);
     UNUSED(line);
 
+    char buff[1024];
+    memset(buff, 0, 1024);
 
-    k_serial_putstr(0x3F8, msg);
+    sprintf(&buff[0], "Assertion failed: %s in %s:%d", msg, file, line);
+
+    k_serial_putstr(0x3F8, buff);
 }
 
 void __libk_putchar(char c){
