@@ -3,11 +3,11 @@ SHELL = /bin/bash
 LOOP_DEVICE := /dev/loop1
 MOUNTPOINT := /mnt/smplos
 
-.PHONY: all build bootloader kernel clean
+.PHONY: all build bootloader libk kernel libc clean
 
 all: build install launch
 
-build: clean prepare bootloader kernel
+build: clean prepare bootloader libk kernel libc
 
 prepare: clean
 	mkdir build
@@ -23,14 +23,28 @@ bootloader: prepare
 bootloader-clean:
 	make -C bootloader clean || :
 
-kernel: bootloader
+libk:
+	make -C libc libk
+	make -C libc libk-install
+
+libc:
+	make -C libc libc
+	make -C libc libc-install
+
+libk-clean:
+	make -C libc libk-clean
+
+libc-clean:
+	make -C libc libc-clean
+
+kernel: bootloader libk
 	make -C kernel
 	make -C kernel install
 
 kernel-clean:
 	make -C kernel clean || :
 
-clean: bootloader-clean kernel-clean
+clean: bootloader-clean kernel-clean libk-clean libc-clean
 	rm -rf bootloader/uefi
 	rm -rf build
 

@@ -228,8 +228,6 @@ int main(int argc, char **argv)
                 bi.icon->w = w;
                 bi.icon->h = h;
                 bi.icon->l = l;
-
-                gop->Blt(gop, image_data, EfiBltBufferToVideo, 0, 0, gop->Mode->Information->HorizontalResolution - w - 20, (20), w, h, 0);
             }
           }      
           free(data.childs[i].name);
@@ -270,9 +268,11 @@ int main(int argc, char **argv)
     }
 
     ST->ConOut->ClearScreen(ST->ConOut);
+    
     if(bi.icon){
         uint32_t buffer = 0xFFFFFF;
-        gop->Blt(gop, &buffer   , EfiBltVideoFill    , 0, 0, 0, 25 + bi.icon->h, gop->Mode->Information->HorizontalResolution, 1, 0);
+        gop->Blt(gop, bi.icon->data, EfiBltBufferToVideo, 0, 0, (gop->Mode->Information->HorizontalResolution - bi.icon->w) / 2, (20), bi.icon->w, bi.icon->h, 0);
+        gop->Blt(gop, &buffer, EfiBltVideoFill, 0, 0, 0, 25 + bi.icon->h, gop->Mode->Information->HorizontalResolution, 1, 0);
     }
 
     if(exit_bs()){
