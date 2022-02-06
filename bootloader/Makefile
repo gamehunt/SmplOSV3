@@ -18,7 +18,7 @@ include uefi/Makefile
 
 clean:
 	$(MAKE) -f uefi/Makefile $@
-	rm $(CLEAN_OBJS) || :
+	rm $(CLEAN_OBJS) 2>/dev/null || :
 
 install:
 	cp $(TARGET) ../build

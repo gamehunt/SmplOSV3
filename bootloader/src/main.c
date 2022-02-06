@@ -172,8 +172,7 @@ int main(int argc, char **argv)
           if(!strcmp(data.childs[i].name, "kernel")){
               b_info("Found kernel entry: %s", data.childs[i].value);
               sprintf(&kernel_path[0], "\\smplos\\%s", data.childs[i].value);
-          } 
-          else if(!strcmp(data.childs[i].name, "video")){
+          }else if(!strcmp(data.childs[i].name, "video")){
             b_info("Found graphics mode entry: %s", data.childs[i].value);
 
             status = gop->SetMode(gop, atoi(data.childs[i].value));            
@@ -229,7 +228,27 @@ int main(int argc, char **argv)
                 bi.icon->h = h;
                 bi.icon->l = l;
             }
-          }      
+          }else if(!strcmp(data.childs[i].name, "ramdisk")){
+            b_info("Found ramdisk entry: %s", data.childs[i].value);
+
+            bi.ramdisk = malloc(sizeof(ramdisk_info_t));
+            bi.ramdisk->data = NULL;
+            bi.ramdisk->size = 0;
+
+            char  ramdisk_path[256];
+            memset(&ramdisk_path[0], 0, 256);
+            sprintf(&ramdisk_path[0], "\\smplos\\%s", data.childs[i].value);
+
+            char* buff;
+            uint32_t size;
+
+            if(b_read_file(ramdisk_path, &buff, &size)){
+                b_warn("Failed to read ramdisk, leaving empty entry");
+            }else{
+                bi.ramdisk->data = (uint8_t*)buff;
+                bi.ramdisk->size = size;
+            }
+          }
           free(data.childs[i].name);
           free(data.childs[i].value);
         }
@@ -268,7 +287,7 @@ int main(int argc, char **argv)
     }
 
     ST->ConOut->ClearScreen(ST->ConOut);
-    
+
     if(bi.icon){
         uint32_t buffer = 0xFFFFFF;
         gop->Blt(gop, bi.icon->data, EfiBltBufferToVideo, 0, 0, (gop->Mode->Information->HorizontalResolution - bi.icon->w) / 2, (20), bi.icon->w, bi.icon->h, 0);

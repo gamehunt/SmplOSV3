@@ -7,13 +7,13 @@ MOUNTPOINT := /mnt/smplos
 
 all: build install launch
 
-build: clean prepare bootloader libk kernel libc
+build: clean prepare bootloader libk kernel libc initrd
 
 prepare: clean
 	mkdir build
 	mkdir build/include
 	test -r /usr/share/ovmf/OVMF.fd && cp /usr/share/ovmf/OVMF.fd build/
-	sudo mkdir /mnt/smplos || :
+	sudo mkdir /mnt/smplos 2>/dev/null || :
 	cd bootloader && (test -h uefi || ln -s ../posix-uefi/uefi)
 
 bootloader: prepare
@@ -47,8 +47,8 @@ kernel-clean:
 	make -C kernel clean || :
 
 clean: bootloader-clean kernel-clean libk-clean libc-clean
-	rm -rf bootloader/uefi
-	rm -rf build
+	rm -rf bootloader/uefi 2>/dev/null || :
+	rm -rf build 2>/dev/null || :
 
 create-disk:
 	dd if=/dev/zero of=disk.img bs=1048576 count=128
@@ -81,7 +81,11 @@ remove-disk: umount-disk
 	rm -rf disk.img
 
 launch: check-ovmf install
-	qemu-system-x86_64 -bios build/OVMF.fd -drive file=disk.img,format=raw -serial stdio -vga std -m 1G
+	qemu-system-x86_64 -bios build/OVMF.fd -drive file=disk.img,format=raw -vga std -m 1G
+
+initrd:
+	echo 'Making ramdisk...'
+	cp ramdisk.initrd build/ramdisk.initrd
 
 install: mount-disk
 	sudo mkdir -p /mnt/smplos/EFI/BOOT/
@@ -90,4 +94,5 @@ install: mount-disk
 	sudo cp build/smplos.elf  /mnt/smplos/smplos/smplos.elf
 	sudo cp boot.cfg /mnt/smplos/smplos/
 	sudo cp icon.png /mnt/smplos/smplos/
+	sudo cp build/ramdisk.initrd /mnt/smplos/smplos/
 	sync

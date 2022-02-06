@@ -37,9 +37,15 @@ typedef struct{
 }icon_info_t;
 
 typedef struct{
+    uint8_t* data;
+    uint32_t size;
+}ramdisk_info_t;
+
+typedef struct{
     memmap_info_t* memmap;
     fb_info_t* framebuffer;
     icon_info_t* icon;
+    ramdisk_info_t* ramdisk;
 }bootinfo_t;
 
 #endif
