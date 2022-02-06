@@ -4,7 +4,6 @@
 #include <stddef.h>
 #include <elf.h>
 #include <bootinfo.h>
-#include <mem.h>
 #include <utils.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -29,6 +28,7 @@ int main(int argc, char **argv)
     ST->BootServices->SetWatchdogTimer(0, 0, 0, NULL);
 
     bootinfo_t bi;
+    bi.icon = NULL;
 
     b_info("-------------SmplOSV3.1 Loader-------------");
     b_info("Retrieving memory map...");
@@ -223,8 +223,13 @@ int main(int argc, char **argv)
                         image_data[l] = ((image_data[l] & 0xff) << 16) | (image_data[l] & 0xff00) | ((image_data[l] >> 16) & 0xff);
                 }
 
+                bi.icon = malloc(sizeof(icon_info_t));
+                bi.icon->data = image_data;
+                bi.icon->w = w;
+                bi.icon->h = h;
+                bi.icon->l = l;
 
-                gop->Blt(gop, image_data, EfiBltBufferToVideo, 0, 0, gop->Mode->Information->HorizontalResolution - w - 20, (gop->Mode->Information->VerticalResolution - h) / 16, w, h, 0);
+                gop->Blt(gop, image_data, EfiBltBufferToVideo, 0, 0, gop->Mode->Information->HorizontalResolution - w - 20, (20), w, h, 0);
             }
           }      
           free(data.childs[i].name);
@@ -262,6 +267,12 @@ int main(int argc, char **argv)
         return 0;
     }else{
         b_info("Kernel entry point: 0x%x", entry);
+    }
+
+    ST->ConOut->ClearScreen(ST->ConOut);
+    if(bi.icon){
+        uint32_t buffer = 0xFFFFFF;
+        gop->Blt(gop, &buffer   , EfiBltVideoFill    , 0, 0, 0, 25 + bi.icon->h, gop->Mode->Information->HorizontalResolution, 1, 0);
     }
 
     if(exit_bs()){

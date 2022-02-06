@@ -1,11 +1,14 @@
 #include <boot/bootinfo.h>
 #include <shared.h>
 
+#include <dev/framebuffer.h>
+#include <dev/serial.h>
+
 void kernel_main(bootinfo_t* info){
     
-    UNUSED(info);
+    k_fb_setup(info->framebuffer);
 
-    __asm__("movq $0x1337, %rax");
+    k_fb_print_string(10, 30 + info->icon->h, "[I] Kernel loaded.");
 
     while(1);
 }

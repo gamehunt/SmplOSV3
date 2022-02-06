@@ -32,8 +32,14 @@ typedef struct{
 }fb_info_t;
 
 typedef struct{
+    uint32_t* data;
+    int w, h, l;
+}icon_info_t;
+
+typedef struct{
     memmap_info_t* memmap;
     fb_info_t* framebuffer;
+    icon_info_t* icon;
 }bootinfo_t;
 
 #endif
