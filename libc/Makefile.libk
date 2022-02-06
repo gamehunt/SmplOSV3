@@ -1,14 +1,16 @@
 ARCH = x86_64
-TARGET = smplos.elf
+TARGET = libk.a
 SRCS = $(wildcard src/*.c src/**/*.c)
 ASM_SRCS = $(wildcard src/*.asm)
 OBJS = $(SRCS:.c=.o) $(ASM_SRCS:.asm=.o)
 
-CFLAGS = -ffreestanding -pedantic -Wall -Wextra -Werror --std=c11 -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -Iinclude -I../shared -I../build/include -D_SMPLOS_KERNEL
-LINK_OPTS = -ffreestanding -T link.ld  -L../build -nostdlib -lgcc -lk -z max-page-size=0x1000
+CFLAGS = -ffreestanding -pedantic -Wall -Wextra -Werror --std=c11 -mno-red-zone -mno-mmx -Iinclude -I../shared -I../build/include -D_SMPLOS_LIBK
+LINK_OPTS = -ffreestanding -nostdlib -lgcc -z max-page-size=0x1000
+AR_OPTS = rcs
 
 CC = $(ARCH)-elf-gcc
 LD = $(ARCH)-elf-ld
+AR = $(ARCH)-elf-ar
 ASM = nasm
 
 .PHONY: clean
@@ -20,7 +22,7 @@ ASM = nasm
 	$(ASM) -felf64 $< -o $@
 
 $(TARGET): $(OBJS)
-	$(CC) $(OBJS) $(LINK_OPTS) -o $@ 
+	$(AR) $(AR_OPTS) $@ $(OBJS)  
 
 all: $(TARGET)
 
@@ -28,5 +30,6 @@ clean:
 	rm $(OBJS) || :
 	rm $(TARGET) || :
 
-install:
+install: 
 	cp $(TARGET) ../build
+

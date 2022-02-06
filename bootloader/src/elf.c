@@ -1,6 +1,5 @@
 #include <elf.h>
 #include <log.h>
-#include <mem.h>
 
 static BSTATUS __check_hdr(Elf64_Ehdr* elf){
     if(memcmp(elf->e_ident, ELFMAG, SELFMAG) || 

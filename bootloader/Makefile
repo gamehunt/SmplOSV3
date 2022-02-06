@@ -1,14 +1,24 @@
 ARCH = x86_64
 TARGET = BOOTX64.EFI
-SRCS = $(wildcard src/*.c) $(wildcard src/*.S)
+
+C_SRCS = $(wildcard src/*.c)
+ASM_SRCS = $(wildcard src/*.S)
+
+SRCS = $(C_SRCS) $(ASM_SRCS)
+
+CLEAN_OBJS = $(SRCS:.c=.o) $(ASM_SRCS:.asm=.o)
 
 CFLAGS = -pedantic -Wall -Wextra -Werror --std=c11 -O2 -Iinclude -I../shared -D_SMPLOS_BOOTLOADER
 LDFLAGS =
 
-ASM = nasm -felf64
+.PHONY: clean
 
 USE_GCC = 1
 include uefi/Makefile
+
+clean:
+	$(MAKE) -f uefi/Makefile $@
+	rm $(CLEAN_OBJS) || :
 
 install:
 	cp $(TARGET) ../build

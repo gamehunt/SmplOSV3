@@ -24,18 +24,20 @@ bootloader-clean:
 	make -C bootloader clean || :
 
 libk:
-	make -C libc libk
-	make -C libc libk-install
+	make -C libc install
+	make -C libc -f Makefile.libk
+	make -C libc -f Makefile.libk install
 
 libc:
-	make -C libc libc
-	make -C libc libc-install
+	make -C libc install
+	make -C libc -f Makefile.libc
+	make -C libc -f Makefile.libc install
 
 libk-clean:
-	make -C libc libk-clean
+	make -C libc -f Makefile.libk clean
 
 libc-clean:
-	make -C libc libc-clean
+	make -C libc -f Makefile.libc clean
 
 kernel: bootloader libk
 	make -C kernel

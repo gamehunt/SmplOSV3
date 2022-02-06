@@ -3,5 +3,6 @@
 
 int  k_serial_is_transmit_empty(int port);
 void k_serial_putchar(int port, char c);
+void k_serial_putstr(int port, const char* s);
 
 #endif
