@@ -65,7 +65,7 @@ remove-disk: umount-disk
 	rm -rf disk.img
 
 launch: check-ovmf install
-	qemu-system-x86_64 -bios build/OVMF.fd -drive file=disk.img,format=raw -serial stdio
+	qemu-system-x86_64 -bios build/OVMF.fd -drive file=disk.img,format=raw -serial stdio -vga std -m 1G
 
 install: mount-disk
 	sudo mkdir -p /mnt/smplos/EFI/BOOT/
@@ -73,4 +73,5 @@ install: mount-disk
 	sudo cp build/BOOTX64.EFI /mnt/smplos/EFI/BOOT/
 	sudo cp build/smplos.elf  /mnt/smplos/smplos/smplos.elf
 	sudo cp boot.cfg /mnt/smplos/smplos/
+	sudo cp icon.png /mnt/smplos/smplos/
 	sync

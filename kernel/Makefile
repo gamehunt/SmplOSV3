@@ -25,8 +25,8 @@ $(TARGET): $(OBJS)
 all: $(TARGET)
 
 clean:
-	rm $(OBJS)
-	rm $(TARGET)
+	rm $(OBJS) || :
+	rm $(TARGET) || :
 
 install:
 	cp $(TARGET) ../build

@@ -1,6 +1,7 @@
 #include <config.h>
 #include <shared.h>
 #include <log.h>
+#include <utils.h>
 
 static char* __fixed_strtok(char* s, char d)
 {
@@ -53,6 +54,13 @@ static BSTATUS __try_parse(char* d, config_result_t* result){
 
     while (pch != NULL && strlen(pch) > 0)
     {
+
+      if(pch[0] == '#'){
+          free(pch);
+          pch = __fixed_strtok (NULL, '\n');
+          continue;
+      }
+
       result->child_count++;
       if(!result->childs){
           result->childs = malloc(sizeof(config_node_t) * result->child_count);
@@ -104,44 +112,25 @@ static BSTATUS __try_parse(char* d, config_result_t* result){
 }
 
 BSTATUS b_config_parse(const char* path, config_result_t* result){
-
     if(!result){
         return CFG_ERR_INVALID_ARGS;
     }
 
-    FILE *f;
-    char *buff;
-    long int size;
+    char *buff = NULL;
+    uint32_t size;
 
-    if((f = fopen(path, "r"))) {
-
-        fseek(f, 0, SEEK_END);
-        size = ftell(f);
-
-        fseek(f, 0, SEEK_SET);
-        buff = malloc(size + 1);
-
-        if(!buff) {
-            result->status = CFG_ERR_GENERIC;
-            return CFG_ERR_GENERIC;
-        }
-
-        fread(buff, size, 1, f);
-        buff[size] = 0;
-
-        fclose(f);
-        
-        result->child_count = 0;
-        result->childs = 0;
-
-        if(__try_parse(buff, result)){
-            result->status = CFG_ERR_PARSING_FAILED;
-            return CFG_ERR_PARSING_FAILED;
-        }
-
-        return CFG_ERR_SUCCESS;
-    } else {
+    if(b_read_file(path, &buff, &size)){
         result->status = CFG_ERR_READ_FAILED;
         return CFG_ERR_READ_FAILED;
     }
+
+    result->child_count = 0;
+    result->childs = 0;
+
+    if(__try_parse(buff, result)){
+        result->status = CFG_ERR_PARSING_FAILED;
+        return CFG_ERR_PARSING_FAILED;
+    }
+
+    return 0;
 }

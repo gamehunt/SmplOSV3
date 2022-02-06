@@ -19,12 +19,16 @@ typedef struct{
 
 typedef struct{
     memmap_entry_t* entries;
-     uint32_t size;
+    uint32_t size;
 }memmap_info_t;
 
 typedef struct{
     uint64_t addr;
     uint64_t size;
+    uint32_t width;
+    uint32_t height;
+    uint32_t pixels_per_scanline;
+    uint32_t pixel_format;
 }fb_info_t;
 
 typedef struct{

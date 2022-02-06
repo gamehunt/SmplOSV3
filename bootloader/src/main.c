@@ -5,6 +5,10 @@
 #include <elf.h>
 #include <bootinfo.h>
 #include <mem.h>
+#include <utils.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 static uint8_t get_memory_type(uint8_t type){
     if(type == 1 || type == 2 || type == 3 || type == 4 || type == 7){
@@ -27,7 +31,6 @@ int main(int argc, char **argv)
     bootinfo_t bi;
 
     b_info("-------------SmplOSV3.1 Loader-------------");
-
     b_info("Retrieving memory map...");
 
     efi_status_t status;
@@ -54,7 +57,6 @@ int main(int argc, char **argv)
     }
 
     bi.memmap = malloc(sizeof(memmap_info_t));
-
     bi.memmap->size = 0;
     bi.memmap->entries = NULL;
 
@@ -100,15 +102,39 @@ int main(int argc, char **argv)
 
     efi_guid_t gopGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
     efi_gop_t *gop = NULL;
-    efi_gop_mode_info_t *info = NULL;
-    UNUSED(info);
 
     status = BS->LocateProtocol(&gopGuid, NULL, (void**)&gop);
 
+    char* names[] = {
+        "8bit RGB",
+        "8bit BGR",
+        "bitmash",
+        "blt only",
+        "max"
+    };
+
     if(!EFI_ERROR(status) && gop) {
-        bi.framebuffer->addr = gop->Mode->FrameBufferBase;
-        bi.framebuffer->size = gop->Mode->FrameBufferSize;
-        b_info("Found framebuffer: 0x%x - 0x%x", bi.framebuffer->addr, bi.framebuffer->addr + bi.framebuffer->size);
+        
+        efi_status_t status = gop->SetMode(gop, gop->Mode->Mode);
+        if (EFI_ERROR(status)) {
+            b_error("Failed to set default graphics mode.");
+            return 0;
+        }
+
+        bi.framebuffer->addr                = gop->Mode->FrameBufferBase;
+        bi.framebuffer->size                = gop->Mode->FrameBufferSize;
+        bi.framebuffer->width               = gop->Mode->Information->HorizontalResolution;
+        bi.framebuffer->height              = gop->Mode->Information->VerticalResolution;
+        bi.framebuffer->pixels_per_scanline = gop->Mode->Information->PixelsPerScanLine;
+        bi.framebuffer->pixel_format        = gop->Mode->Information->PixelFormat;
+        
+        b_info("Found framebuffer: [%d] 0x%x - 0x%x (%dx%d, %dpps %s)",
+             gop->Mode->Mode,
+             bi.framebuffer->addr, 
+             bi.framebuffer->addr + bi.framebuffer->size, 
+             bi.framebuffer->width, bi.framebuffer->height, 
+             bi.framebuffer->pixels_per_scanline, 
+             names[bi.framebuffer->pixel_format]);
     }else{
         b_error("Unable to get graphics output protocol.");
         return 0;
@@ -120,6 +146,8 @@ int main(int argc, char **argv)
 
     char kernel_path[256];
     memset(kernel_path, 0, 256);
+
+    uint32_t size;
 
     if(b_config_parse("\\smplos\\boot.cfg", &data)){
         char* msg;
@@ -147,15 +175,58 @@ int main(int argc, char **argv)
           } 
           else if(!strcmp(data.childs[i].name, "video")){
             b_info("Found graphics mode entry: %s", data.childs[i].value);
-            status = gop->SetMode(gop, atoi(data.childs[i].value));
-            ST->ConOut->Reset(ST->ConOut, 0);
-            ST->StdErr->Reset(ST->StdErr, 0);
+
+            status = gop->SetMode(gop, atoi(data.childs[i].value));            
+
             if(EFI_ERROR(status)) {
                 b_error("Unable to set video mode\n");
             }else{
-                b_info("Graphics mode set to %s", data.childs[i].value);
+                ST->ConOut->ClearScreen(ST->ConOut);
+
+                bi.framebuffer->addr                = gop->Mode->FrameBufferBase;
+                bi.framebuffer->size                = gop->Mode->FrameBufferSize;
+                bi.framebuffer->width               = gop->Mode->Information->HorizontalResolution;
+                bi.framebuffer->height              = gop->Mode->Information->VerticalResolution;
+                bi.framebuffer->pixels_per_scanline = gop->Mode->Information->PixelsPerScanLine;
+                bi.framebuffer->pixel_format        = gop->Mode->Information->PixelFormat;
+
+                b_info("Graphics mode set to %d (%dx%d, %dpps %s)", gop->Mode->Mode,  bi.framebuffer->width, bi.framebuffer->height, bi.framebuffer->pixels_per_scanline, names[bi.framebuffer->pixel_format]);
             }
-          }   
+          }else if(!strcmp(data.childs[i].name, "icon")){
+            b_info("Found icon entry: %s", data.childs[i].value);
+
+            char* icon = NULL;
+            uint32_t* image_data;
+            char  icon_path[256];
+            memset(&icon_path[0], 0, 256);
+
+            int w,h,l;
+
+            sprintf(&icon_path[0], "\\smplos\\%s", data.childs[i].value);
+
+            if(b_read_file(icon_path, &icon, &size)){
+                b_warn("Failed to read icon file, skipping...");
+            }else{
+                stbi__context s;
+                stbi__result_info ri;
+
+                ri.bits_per_channel = 8;
+                s.read_from_callbacks = 0;
+                s.img_buffer = s.img_buffer_original = (uint8_t*)icon;
+                s.img_buffer_end = s.img_buffer_original_end = (uint8_t*)icon + size;
+
+                image_data = (uint32_t*)stbi__png_load(&s, &w, &h, &l, 4, &ri);
+
+                if(gop->Mode->Information->PixelFormat == PixelBlueGreenRedReserved8BitPerColor ||
+                    (gop->Mode->Information->PixelFormat == PixelBitMask && gop->Mode->Information->PixelInformation.BlueMask != 0xff0000)) {
+                    for(l = 0; l < w * h; l++)
+                        image_data[l] = ((image_data[l] & 0xff) << 16) | (image_data[l] & 0xff00) | ((image_data[l] >> 16) & 0xff);
+                }
+
+
+                gop->Blt(gop, image_data, EfiBltBufferToVideo, 0, 0, gop->Mode->Information->HorizontalResolution - w - 20, (gop->Mode->Information->VerticalResolution - h) / 16, w, h, 0);
+            }
+          }      
           free(data.childs[i].name);
           free(data.childs[i].value);
         }
@@ -167,25 +238,9 @@ int main(int argc, char **argv)
         strcpy(kernel_path, "\\smplos\\smplos.elf");
     }
 
-    FILE *f;
-    char *buff;
-    long int size;
+    char *buff = NULL;
 
-    if((f = fopen(kernel_path, "r"))) {
-        fseek(f, 0, SEEK_END);
-        size = ftell(f);
-
-        fseek(f, 0, SEEK_SET);
-        buff = malloc(size + 1);
-
-        if(!buff) {
-            b_error("Malloc failure");
-            return 0;
-        }
-
-        fread(buff, size, 1, f);
-        fclose(f);
-    }else{
+    if(b_read_file(kernel_path, &buff, &size)) {
         b_error("Failed to load kernel: Failed to read file");
         return 0;
     }
