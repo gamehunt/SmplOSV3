@@ -6,7 +6,7 @@ ASM_SRCS = $(wildcard src/*.S)
 
 SRCS = $(C_SRCS) $(ASM_SRCS)
 
-CLEAN_OBJS = $(SRCS:.c=.o) $(ASM_SRCS:.asm=.o)
+CLEAN_OBJS = $(SRCS:.c=.o) $(ASM_SRCS:.S=.o)
 
 CFLAGS = -pedantic -Wall -Wextra -Werror --std=c11 -O2 -Iinclude -I../shared -D_SMPLOS_BOOTLOADER
 LDFLAGS =
